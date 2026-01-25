@@ -231,58 +231,89 @@ function glossaryLiElement(dictName, html, css) {
 // the following two should roughly match the glossary format of yomitan and keep compatibility with notetypes like lapis
 // 23.01.2026: this still has some differences
 // 24.01.2026: should be a bit closer now
+// 25.01.2026: fixed jmdict
 function constructSingleGlossaryHtml(entryIndex) {
-    const entries = document.querySelectorAll('.entry');
-    if (entryIndex >= entries.length) {
+    if (!window.lookupEntries || entryIndex >= window.lookupEntries.length) {
         return {};
     }
 
-    const entry = entries[entryIndex];
+    const entry = window.lookupEntries[entryIndex];
     const glossaries = {};
 
-    entry.querySelectorAll('.glossary-group').forEach(group => {
-        const host = group.querySelector('div');
-        const dictName = group.querySelector('summary')?.textContent || '';
-        if (!dictName) {
-            return;
+    entry.glossaries.forEach(g => {
+        const dictName = g.dictionary;
+        if (glossaries[dictName]) return;
+        
+        const tempDiv = document.createElement('div');
+        try {
+            renderStructuredContent(tempDiv, JSON.parse(g.content));
+        } catch {
+            renderStructuredContent(tempDiv, g.content);
         }
-
-        if (host?.shadowRoot) {
-            const html = host.shadowRoot.innerHTML
-                .replace(/<style>[\s\S]*?<\/style>/, '');
-            const css = window.dictionaryStyles?.[dictName] ?? '';
-            glossaries[dictName] = `<div style="text-align: left;" class="yomitan-glossary"><ol>${glossaryLiElement(dictName, html, css)}</ol></div>`;
-        }
+        
+        const css = window.dictionaryStyles?.[dictName] ?? '';
+        glossaries[dictName] = `<div style="text-align: left;" class="yomitan-glossary"><ol>${glossaryLiElement(dictName, tempDiv.innerHTML, css)}</ol></div>`;
     });
 
     return glossaries;
 }
 
 function constructGlossaryHtml(entryIndex) {
-    const entries = document.querySelectorAll('.entry');
-    if (entryIndex >= entries.length) {
+    if (!window.lookupEntries || entryIndex >= window.lookupEntries.length) {
         return null;
     }
 
-    const entry = entries[entryIndex];
-    let result = '<div style="text-align: left;" class="yomitan-glossary"><ol>';
+    const entry = window.lookupEntries[entryIndex];
+    let glossaryItems = '';
+    const styles = {};
+    let lastDict = '';
+    let index = 0;
 
-    entry.querySelectorAll('.glossary-group').forEach(group => {
-        const host = group.querySelector('div');
-        const dictName = group.querySelector('summary')?.textContent || '';
-        if (!dictName) {
-            return;
+    entry.glossaries.forEach(g => {
+        const dictName = g.dictionary;
+        
+        const tempDiv = document.createElement('div');
+        try {
+            renderStructuredContent(tempDiv, JSON.parse(g.content));
+        } catch {
+            renderStructuredContent(tempDiv, g.content);
         }
-
-        if (host?.shadowRoot) {
-            const html = host.shadowRoot.innerHTML
-                .replace(/<style>[\s\S]*?<\/style>/, '');
-            const css = window.dictionaryStyles?.[dictName] ?? '';
-            result += glossaryLiElement(dictName, html, css);
+        
+        index++;
+        let label = '';
+        if (dictName !== lastDict) {
+            index = 1;
+            lastDict = dictName;
+            label = `<i>(${index}, ${dictName})</i> `
+        }
+        else {
+            label = `<i>(${index})</i> `
+        }
+        
+        glossaryItems += `<li data-dictionary="${dictName}">${label}<span>${applyTableStyles(tempDiv.innerHTML)}</span></li>`;
+        
+        const css = window.dictionaryStyles?.[dictName];
+        if (css && !styles[dictName]) {
+            styles[dictName] = css;
         }
     });
 
-    result += '</ol></div>';
+    let result = '<div style="text-align: left;" class="yomitan-glossary"><ol>';
+    result += glossaryItems;
+    result += '</ol>';
+    
+    for (const [dictName, css] of Object.entries(styles)) {
+        const scopedCss = constructDictCss(css, dictName);
+        const formatted = scopedCss
+            .replace(/\s+/g, ' ')
+            .replace(/\s*\{\s*/g, ' { ')
+            .replace(/\s*\}\s*/g, ' }\n')
+            .replace(/;\s*/g, '; ')
+            .trim();
+        result += `<style>${formatted}</style>`;
+    }
+    
+    result += '</div>';
     return result;
 }
 
@@ -363,12 +394,19 @@ function renderStructuredContent(parent, node) {
 
     if (Array.isArray(node)) {
         const isStringArray = node.every(item => typeof item === 'string');
-        node.forEach((child, i) => {
-            if (isStringArray && i > 0) {
-                parent.appendChild(document.createElement('br'));
-            }
-            renderStructuredContent(parent, child);
-        });
+        
+        if (isStringArray && node.length > 1) {
+            const ul = document.createElement('ul');
+            node.forEach(child => {
+                const li = document.createElement('li');
+                li.appendChild(document.createTextNode(child));
+                ul.appendChild(li);
+            });
+            parent.appendChild(ul);
+            return;
+        }
+        
+        node.forEach(child => renderStructuredContent(parent, child));
         return;
     }
 
@@ -533,16 +571,30 @@ function createGlossarySection(dictName, contents, isFirst) {
             ${dictStyle}
         `.trim()
     }));
-
-    contents.forEach(content => {
-        const wrapper = document.createElement('div');
-        try {
-            renderStructuredContent(wrapper, JSON.parse(content));
-        } catch {
-            renderStructuredContent(wrapper, content);
-        }
-        shadow.appendChild(wrapper);
-    });
+    
+    if (contents.length > 1) {
+        const ol = document.createElement('ol');
+        contents.forEach(content => {
+            const li = document.createElement('li');
+            try {
+                renderStructuredContent(li, JSON.parse(content));
+            } catch {
+                renderStructuredContent(li, content);
+            }
+            ol.appendChild(li);
+        });
+        shadow.appendChild(ol);
+    } else {
+        contents.forEach(content => {
+            const wrapper = document.createElement('div');
+            try {
+                renderStructuredContent(wrapper, JSON.parse(content));
+            } catch {
+                renderStructuredContent(wrapper, content);
+            }
+            shadow.appendChild(wrapper);
+        });
+    }
 
     details.appendChild(shadowHost);
     return details;

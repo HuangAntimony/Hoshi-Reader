@@ -1,0 +1,42 @@
+{
+  "originHash" : "e0a90018dbc944c7bdd2b55489b2ae99a0e7c4df6776cc7ec886ef80515d70e9",
+  "pins" : [
+    {
+      "identity" : "aexml",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tadija/AEXML",
+      "state" : {
+        "revision" : "db806756c989760b35108146381535aec231092b",
+        "version" : "4.7.0"
+      }
+    },
+    {
+      "identity" : "yomitandicts-cpp",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:Manhhao/yomitandicts-cpp.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "8576192caf089ea4aaed91d630f473e371156eb2"
+      }
+    },
+    {
+      "identity" : "ziparchive",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ZipArchive/ZipArchive",
+      "state" : {
+        "revision" : "df35718ea19a94e015b91dc4881dee028ce4cdba",
+        "version" : "2.6.0"
+      }
+    },
+    {
+      "identity" : "zstd",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/facebook/zstd.git",
+      "state" : {
+        "revision" : "f8745da6ff1ad1e7bab384bd1f9d742439278e99",
+        "version" : "1.5.7"
+      }
+    }
+  ],
+  "version" : 3
+}

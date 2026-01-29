@@ -27,6 +27,7 @@ struct DictionaryInfo: Identifiable, Codable {
 struct DictionaryConfig: Codable {
     var termDictionaries: [DictionaryEntry]
     var frequencyDictionaries: [DictionaryEntry]
+    var pitchDictionaries: [DictionaryEntry]
     
     struct DictionaryEntry: Codable {
         let fileName: String
@@ -45,6 +46,11 @@ struct FrequencyData: Encodable {
     let frequencies: [FrequencyTag]
 }
 
+struct PitchData: Encodable {
+    let dictionary: String
+    let pitchPositions: [Int]
+}
+
 struct EntryData: Encodable {
     let expression: String
     let reading: String
@@ -52,6 +58,8 @@ struct EntryData: Encodable {
     let deinflectionTrace: [DeinflectionTag]
     let glossaries: [GlossaryData]
     let frequencies: [FrequencyData]
+    let pitches: [PitchData]
+    let definitionTags: [String]
 }
 
 struct DeinflectionTag: Encodable {

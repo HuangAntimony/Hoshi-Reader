@@ -186,7 +186,7 @@ struct DictionarySearchBar: View {
                 }
             }
             .padding(10)
-            .background(.ultraThinMaterial)
+            .background(.ultraThinMaterial, in: Capsule())
             .contentShape(Capsule())
             .padding(.horizontal, 20)
         }

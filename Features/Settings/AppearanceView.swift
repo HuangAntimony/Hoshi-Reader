@@ -40,15 +40,17 @@ struct AppearanceView: View {
                 }
                 
                 Section("Reader Layout") {
-                    HStack {
-                        Text("Text Orientation")
-                        Spacer()
-                        Picker("", selection: $userConfig.verticalWriting) {
-                            Text("縦").tag(true)
-                            Text("横").tag(false)
+                    if #available(iOS 26, *) {
+                        HStack {
+                            Text("Text Orientation")
+                            Spacer()
+                            Picker("", selection: $userConfig.verticalWriting) {
+                                Text("縦").tag(true)
+                                Text("横").tag(false)
+                            }
+                            .pickerStyle(.segmented)
+                            .frame(width: 100)
                         }
-                        .pickerStyle(.segmented)
-                        .frame(width: 100)
                     }
                     
                     HStack {

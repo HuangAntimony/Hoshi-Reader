@@ -48,7 +48,7 @@ enum Handlebars: String, CaseIterable {
     case furiganaPlain = "{furigana-plain}"
     case glossary = "{glossary}"
     case glossaryFirst = "{glossary-first}"
-    case selectionText = "{selection-text}"
+    case popupSelectionText = "{popup-selection-text}"
     case sentence = "{sentence}"
     case frequencies = "{frequencies}"
     case frequencyHarmonicRank = "{frequency-harmonic-rank}"

@@ -412,7 +412,7 @@ function getFrequencyHarmonicRank(frequencies) {
     return String(Math.round(values.length / sumOfReciprocals));
 }
 
-async function mineEntry(expression, reading, frequencies, pitches, definitionTags, matched, entryIndex, selectionText) {
+async function mineEntry(expression, reading, frequencies, pitches, definitionTags, matched, entryIndex, popupSelectionText) {
     const idx = entryIndex || 0;
     const furiganaPlain = constructFuriganaPlain(expression, reading);
     const glossary = constructGlossaryHtml(idx);
@@ -441,7 +441,7 @@ async function mineEntry(expression, reading, frequencies, pitches, definitionTa
         singleGlossaries: JSON.stringify(singleGlossaries),
         pitchPositions,
         pitchCategories,
-        selectionText,
+        popupSelectionText,
         audio
     });
 }

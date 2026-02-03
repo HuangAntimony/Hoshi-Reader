@@ -156,8 +156,8 @@ class AnkiManager {
                     value = context.sentence.replacingOccurrences(of: matched, with: "<b>\(matched)</b>")
                 case .documentTitle:
                     value = context.documentTitle ?? ""
-                case .selectionText:
-                    value = content["selectionText"] ?? ""
+                case .popupSelectionText:
+                    value = content["popupSelectionText"] ?? ""
                 case .bookCover:
                     value = coverPath ?? ""
                 case .audio:

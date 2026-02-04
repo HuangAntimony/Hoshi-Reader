@@ -18,7 +18,8 @@ struct BookshelfView: View {
     @State private var showAppearance = false
     @State private var showAdvanced = false
     @State private var showDictionarySearch = false
-    
+    @Binding var pendingImportURL: URL?
+
     private let columns = [
         GridItem(.adaptive(minimum: 160), spacing: 20)
     ]
@@ -39,6 +40,12 @@ struct BookshelfView: View {
             }
             .onAppear {
                 viewModel.loadBooks()
+            }
+            .onChange(of: pendingImportURL) { _, url in
+                if let url {
+                    viewModel.importBook(result: .success(url))
+                    pendingImportURL = nil
+                }
             }
             .fileImporter(
                 isPresented: $viewModel.isImporting,

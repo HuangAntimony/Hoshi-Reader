@@ -17,10 +17,11 @@ struct HoshiReaderApp: App {
     }
     
     @State private var userConfig = UserConfig()
+    @State private var pendingImportURL: URL?
     
     var body: some Scene {
         WindowGroup {
-            BookshelfView()
+            BookshelfView(pendingImportURL: $pendingImportURL)
                 .environment(userConfig)
                 .preferredColorScheme(userConfig.theme == .custom ? userConfig.uiTheme.colorScheme : userConfig.theme.colorScheme)
                 .onOpenURL { url in
@@ -30,13 +31,14 @@ struct HoshiReaderApp: App {
     }
     
     private func handleURL(_ url: URL) {
-        guard url.scheme == "hoshi" else {
-            return
-        }
-        if url.host == "ankiFetch" {
-            AnkiManager.shared.fetch()
-        } else {
-            AnkiManager.shared.stopServer()
+        if url.scheme == "hoshi" {
+            if url.host == "ankiFetch" {
+                AnkiManager.shared.fetch()
+            } else {
+                AnkiManager.shared.stopServer()
+            }
+        } else if url.isFileURL {
+            pendingImportURL = url
         }
     }
 }

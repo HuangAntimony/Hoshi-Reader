@@ -268,7 +268,7 @@ class BookshelfViewModel {
         }
         
         let destinationPath = "Books/\(safeTitle).epub"
-        let localURL = try BookStorage.copySecurityScopedFile(from: sourceURL, to: destinationPath)
+        let localURL = try BookStorage.copyFile(from: tempURL, to: destinationPath)
         let bookFolder = localURL.deletingPathExtension()
         
         let document = try BookStorage.loadEpub(localURL)

@@ -82,7 +82,7 @@ class DictionaryManager {
         let directory = try Self.getDictionariesDirectory()
             .appendingPathComponent(type.rawValue)
         
-        if !FileManager.default.fileExists(atPath: directory.path) {
+        if !FileManager.default.fileExists(atPath: directory.path(percentEncoded: false)) {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         }
         
@@ -99,7 +99,7 @@ class DictionaryManager {
         let configURL = try Self.getDictionariesDirectory()
             .appendingPathComponent(Self.configFileName)
         
-        if FileManager.default.fileExists(atPath: configURL.path) {
+        if FileManager.default.fileExists(atPath: configURL.path(percentEncoded: false)) {
             let data = try Data(contentsOf: configURL)
             let decoder = JSONDecoder()
             return try decoder.decode(DictionaryConfig.self, from: data)
@@ -143,7 +143,7 @@ class DictionaryManager {
             let data = try encoder.encode(config)
             
             let directory = configURL.deletingLastPathComponent()
-            if !FileManager.default.fileExists(atPath: directory.path) {
+            if !FileManager.default.fileExists(atPath: directory.path(percentEncoded: false)) {
                 try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             }
             
@@ -153,17 +153,66 @@ class DictionaryManager {
         }
     }
     
+    func importRecommendedDictionaries() {
+        let recommendedDictionaries: [(url: String, type: DictionaryType)] = [
+            ("https://github.com/yomidevs/jmdict-yomitan/releases/latest/download/JMdict_english.zip", .term),
+            ("https://api.jiten.moe/api/frequency-list/download", .frequency),
+        ]
+        
+        isImporting = true
+        
+        Task.detached {
+            var tempFiles: [URL] = []
+            defer {
+                for file in tempFiles {
+                    try? FileManager.default.removeItem(at: file)
+                }
+            }
+            
+            do {
+                for (url, type) in recommendedDictionaries {
+                    let (temp, _) = try await URLSession.shared.download(from: URL(string: url)!)
+                    tempFiles.append(temp)
+                    
+                    let destinationPath = try await Self.getDictionariesDirectory()
+                        .appendingPathComponent(type.rawValue).path(percentEncoded: false)
+                    
+                    let importResult = dictionary_importer.import(
+                        std.string(temp.path(percentEncoded: false)),
+                        std.string(destinationPath)
+                    )
+                    
+                    if importResult.term_count == 0 && importResult.meta_count == 0 {
+                        throw URLError(.cannotParseResponse)
+                    }
+                }
+                
+                await MainActor.run {
+                    self.isImporting = false
+                    self.loadDictionaries()
+                    self.saveDictionaryConfig()
+                    self.rebuildLookupQuery()
+                }
+            } catch {
+                await MainActor.run {
+                    self.isImporting = false
+                    self.showError("failed to download dictionaries: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
     func importDictionary(from url: URL, type: DictionaryType) {
         guard url.startAccessingSecurityScopedResource() else {
             showError("failed to access dictionary")
             return
         }
-        let sourcePath = url.path
+        let sourcePath = url.path(percentEncoded: false)
         
         let destinationPath: String
         do {
             destinationPath = try Self.getDictionariesDirectory()
-                .appendingPathComponent(type.rawValue).path
+                .appendingPathComponent(type.rawValue).path(percentEncoded: false)
         } catch {
             showError("failed to import dictionary: \(error.localizedDescription)")
             return

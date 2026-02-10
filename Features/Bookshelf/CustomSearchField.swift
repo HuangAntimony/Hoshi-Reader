@@ -15,12 +15,15 @@ class SearchField: UITextField {
     
     override func didMoveToWindow() {
         super.didMoveToWindow()
+        guard window != nil else { return }
         // get the coordinator of the transition of navigation push
         let transitionCoordinator = self.parentViewController?.transitionCoordinator
         if let transitionCoordinator {
             transitionCoordinator.animate(alongsideTransition: nil) { _ in
                 self.onTransitionComplete?()
             }
+        } else {
+            self.onTransitionComplete?()
         }
     }
     
@@ -74,7 +77,7 @@ struct CustomSearchField: UIViewRepresentable {
             }
         }
         
-        if uiView.text != searchText{
+        if uiView.text != searchText {
             uiView.text = searchText
         }
     }

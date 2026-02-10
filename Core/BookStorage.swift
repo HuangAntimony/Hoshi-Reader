@@ -13,6 +13,7 @@ enum FileNames: Sendable {
     static let metadata = "metadata.json"
     static let bookmark = "bookmark.json"
     static let bookinfo = "bookinfo.json"
+    static let shelves = "shelves.json"
 }
 
 struct BookStorage {
@@ -41,7 +42,7 @@ struct BookStorage {
         let destinationURL = documentsDirectory.appendingPathComponent(destinationPath ?? fileURL.lastPathComponent)
         
         let destinationFolder = destinationURL.deletingLastPathComponent()
-        if !FileManager.default.fileExists(atPath: destinationFolder.path) {
+        if !FileManager.default.fileExists(atPath: destinationFolder.path(percentEncoded: false)) {
             try FileManager.default.createDirectory(at: destinationFolder, withIntermediateDirectories: true)
         }
         
@@ -54,12 +55,12 @@ struct BookStorage {
         let documentsDirectory = try getDocumentsDirectory()
         let destinationURL = documentsDirectory.appendingPathComponent(destinationPath)
         
-        if destinationURL.path == fileURL.path {
+        if destinationURL.path(percentEncoded: false) == fileURL.path(percentEncoded: false) {
             return destinationURL
         }
         
         let destinationFolder = destinationURL.deletingLastPathComponent()
-        if !FileManager.default.fileExists(atPath: destinationFolder.path) {
+        if !FileManager.default.fileExists(atPath: destinationFolder.path(percentEncoded: false)) {
             try FileManager.default.createDirectory(at: destinationFolder, withIntermediateDirectories: true)
         }
         
@@ -73,7 +74,7 @@ struct BookStorage {
     }
     
     static func delete(at url: URL) throws {
-        guard FileManager.default.fileExists(atPath: url.path) else {
+        guard FileManager.default.fileExists(atPath: url.path(percentEncoded: false)) else {
             return
         }
         try FileManager.default.removeItem(at: url)
@@ -90,7 +91,7 @@ struct BookStorage {
     }
     
     private static func load<T: Decodable>(_ type: T.Type, from url: URL) -> T? {
-        guard FileManager.default.fileExists(atPath: url.path),
+        guard FileManager.default.fileExists(atPath: url.path(percentEncoded: false)),
               let data = try? Data(contentsOf: url) else {
             return nil
         }
@@ -109,10 +110,14 @@ struct BookStorage {
         load(BookMetadata.self, from: root.appendingPathComponent(FileNames.metadata))
     }
     
+    static func loadShelves() -> [BookShelf]? {
+        load([BookShelf].self, from: try! getBooksDirectory().appendingPathComponent(FileNames.shelves))
+    }
+    
     static func loadAllBooks() throws -> [BookMetadata] {
         let booksDirectory = try getBooksDirectory()
         
-        if !FileManager.default.fileExists(atPath: booksDirectory.path) {
+        if !FileManager.default.fileExists(atPath: booksDirectory.path(percentEncoded: false)) {
             try FileManager.default.createDirectory(at: booksDirectory, withIntermediateDirectories: true)
         }
         
@@ -132,7 +137,7 @@ struct BookStorage {
             
             let metadataURL = url.appendingPathComponent(FileNames.metadata)
             
-            if FileManager.default.fileExists(atPath: metadataURL.path) {
+            if FileManager.default.fileExists(atPath: metadataURL.path(percentEncoded: false)) {
                 let data = try Data(contentsOf: metadataURL)
                 let book = try JSONDecoder().decode(BookMetadata.self, from: data)
                 books.append(book)

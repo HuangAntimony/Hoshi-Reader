@@ -10,10 +10,10 @@ A lightweight Japanese EPUB reader designed for iOS 26 with Yomitan dictionary s
 <p align="center">
     <img src="Pictures/books.PNG" width="25%" alt="books">
     <img src="Pictures/reader.PNG" width="25%" alt="reader">
-    <img src="Pictures/popup.PNG" width="25%" alt="popup">
+    <img src="Pictures/popup_dict.PNG" width="25%" alt="popup">
     <img src="Pictures/appearance.PNG" width="25%" alt="appearance">
-    <img src="Pictures/chapters.PNG" width="25%" alt="chapters">
-    <img src="Pictures/dictionary.PNG" width="25%" alt="dictionary">
+    <img src="Pictures/anki_view.PNG" width="25%" alt="anki">
+    <img src="Pictures/dictionary_view.PNG" width="25%" alt="dictionary">
 </p>
 
 ## Download
@@ -23,11 +23,16 @@ A lightweight Japanese EPUB reader designed for iOS 26 with Yomitan dictionary s
 
 <div align="left">
 
-- Vertical text (縦書き)
-- Reimplementation of a Yomitan-like popup dictionary with deinflection support
-- Full support for Yomitan term and frequency dictionaries
-- Anki integration, one click mining
-- Mining handlebars that conform to Yomitan's format
+- **Vertical** (縦書き) and horizontal (横書き) text
+- Yomitan-like pop-up dictionary with **deinflection support**
+- Support for **all** Yomitan term, frequency and pitch dictionaries
+- **Audio support** for Yomitan online and **local audio** sources made for Ankiconnect Android
+- **AnkiMobile integration** with one-click mining
+- Support for all core handlebars used by [Lapis](https://github.com/donkuri/lapis)
+- **ッツ Reader sync**
+- Dictionary search
+- Bookshelves
+- Custom themes, fonts and css
 
 </div>
 </div>
@@ -48,8 +53,12 @@ A lightweight Japanese EPUB reader designed for iOS 26 with Yomitan dictionary s
 
 | Name | Description | License |
 | :--- | :--- | :--- |
-| [Yomitan](https://github.com/yomidevs/yomitan) | Pitch accent implementation, Furigana Segmenter | GPLv3 |
 | [Ankiconnect Android](https://github.com/KamWithK/AnkiconnectAndroid) | Local Audio implementation | GPLv3 |
+| [Yomitan](https://github.com/yomidevs/yomitan) | Pitch accent implementation, Furigana Segmenter | GPLv3 |
+| [JMdict for Yomitan](https://github.com/yomidevs/jmdict-yomitan) | Recommended term dictionary | MIT |
+| [Jiten](https://github.com/Sirush/Jiten) | Recommended frequency dictionary | Apache-2.0 |
+| [Kanji alive](https://github.com/kanjialive/kanji-data-media) | Default audio source | CC-BY-4.0 |
+| [Tofugu/WaniKani Audio](https://github.com/tofugu/japanese-vocabulary-pronunciation-audio) | Default audio source | CC-BY-SA-4.0 |
 
 ## Issues
 

@@ -35,14 +35,16 @@ struct BookshelfView: View {
                     ScrollView {
                         let sections = viewModel.shelfSections(sortedBy: userConfig.bookshelfSortOption)
                         ForEach(sections, id: \.shelf?.name) { section in
-                            ShelfView(
-                                viewModel: viewModel,
-                                section: section,
-                                showTitle: sections.count > 1,
-                                isSelecting: isSelecting,
-                                selectedBooks: $selectedBooks,
-                                pendingLookup: $pendingLookup
-                            )
+                            if section.books.count > 0 {
+                                ShelfView(
+                                    viewModel: viewModel,
+                                    section: section,
+                                    showTitle: sections.count > 1,
+                                    isSelecting: isSelecting,
+                                    selectedBooks: $selectedBooks,
+                                    pendingLookup: $pendingLookup
+                                )
+                            }
                         }
                     }
                     .navigationTitle("Books")

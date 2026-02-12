@@ -989,5 +989,14 @@ document.addEventListener('DOMContentLoaded', () => {
         customStyle.textContent = window.customCSS;
         document.body.appendChild(customStyle);
     }
+
+    if (window.audioEnableAutoplay && window.audioSources?.length && window.lookupEntries.length > 0) {
+        setTimeout(() => {
+            const audioButton = document.querySelector('.audio-button');
+            if (audioButton) {
+                audioButton.click();
+            }
+        }, 30);
+    }
 });
 

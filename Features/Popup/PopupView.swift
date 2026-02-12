@@ -220,6 +220,7 @@ struct PopupView: View {
             window.collapseDictionaries = \(userConfig.collapseDictionaries);
             window.compactGlossaries = \(userConfig.compactGlossaries);
             window.audioSources = \(audioSources);
+            window.audioEnableAutoplay = \(userConfig.audioEnableAutoplay);
             window.needsAudio = \(AnkiManager.shared.needsAudio);
             window.customCSS = \(customCSS);
         </script>

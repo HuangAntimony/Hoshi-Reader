@@ -87,6 +87,7 @@ struct PopupWebView: UIViewRepresentable {
         config.userContentController.add(context.coordinator, name: "mineEntry")
         config.userContentController.add(context.coordinator, name: "openLink")
         config.setURLSchemeHandler(ProxyHandler(), forURLScheme: "proxy")
+        config.mediaTypesRequiringUserActionForPlayback = []
         
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.isOpaque = false

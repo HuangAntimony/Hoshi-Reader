@@ -17,6 +17,7 @@ struct AudioView: View {
     @State private var importedSize: String?
     
     var body: some View {
+        @Bindable var userConfig = userConfig
         List {
             Section("Sources") {
                 ForEach(Array(userConfig.audioSources.enumerated()), id: \.element.id) { index, source in
@@ -68,7 +69,11 @@ struct AudioView: View {
             }
             
             Section {
-                Toggle("Enable", isOn: Bindable(userConfig).enableLocalAudio)
+                Toggle("Auto-play on Lookup", isOn: $userConfig.audioEnableAutoplay)
+            }
+            
+            Section {
+                Toggle("Enable", isOn: $userConfig.enableLocalAudio)
                 if userConfig.enableLocalAudio {
                     Button("Import") {
                         isImporting = true

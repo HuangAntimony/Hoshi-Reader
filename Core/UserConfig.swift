@@ -152,6 +152,10 @@ class UserConfig {
         }
     }
     
+    var audioEnableAutoplay: Bool {
+        didSet { UserDefaults.standard.set(audioEnableAutoplay, forKey: "audioEnableAutoplay") }
+    }
+    
     var enabledAudioSources: [String] {
         audioSources.filter { $0.isEnabled }.map { $0.url }
     }
@@ -232,6 +236,7 @@ class UserConfig {
             self.audioSources = [UserConfig.defaultAudioSource]
         }
         self.enableLocalAudio = defaults.object(forKey: "enableLocalAudio") as? Bool ?? false
+        self.audioEnableAutoplay = defaults.object(forKey: "audioEnableAutoplay") as? Bool ?? false
         self.customCSS = defaults.string(forKey: "customCSS") ?? ""
         
         self.enableStatistics = defaults.object(forKey: "enableStatistics") as? Bool ?? false

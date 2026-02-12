@@ -25,6 +25,7 @@ struct ReaderWebView: UIViewRepresentable {
     let fileURL: URL?
     let userConfig: UserConfig
     let viewSize: CGSize
+    let clearHighlight: Bool
     
     let currentProgress: Double
     var onNextChapter: () -> Bool
@@ -67,6 +68,7 @@ struct ReaderWebView: UIViewRepresentable {
         webView.addGestureRecognizer(tap)
         
         context.coordinator.webView = webView
+        context.coordinator.lastClearHighlight = clearHighlight
         
         webView.alpha = 0
         
@@ -77,6 +79,11 @@ struct ReaderWebView: UIViewRepresentable {
     
     func updateUIView(_ webView: WKWebView, context: Context) {
         context.coordinator.parent = self
+        if context.coordinator.lastClearHighlight != clearHighlight {
+            context.coordinator.lastClearHighlight = clearHighlight
+            context.coordinator.clearHighlight()
+        }
+        
         guard let url = fileURL else {
             return
         }
@@ -99,6 +106,7 @@ struct ReaderWebView: UIViewRepresentable {
         var parent: ReaderWebView
         weak var webView: WKWebView?
         var currentURL: URL?
+        var lastClearHighlight = false
         
         init(_ parent: ReaderWebView) {
             self.parent = parent

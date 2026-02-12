@@ -51,6 +51,7 @@ struct ReaderView: View {
     @State private var viewModel: ReaderViewModel
     @State private var topSafeArea: CGFloat = 0
     @State private var focusMode = false
+    @State private var clearHighlight = false
     
     private let webViewPadding: CGFloat = 4
     private let lineHeight: CGFloat = 16
@@ -105,6 +106,7 @@ struct ReaderView: View {
                         fileURL: viewModel.getCurrentChapter(),
                         userConfig: userConfig,
                         viewSize: CGSize(width: geometry.size.width, height: geometry.size.height),
+                        clearHighlight: clearHighlight,
                         currentProgress: viewModel.currentProgress,
                         onNextChapter: viewModel.nextChapter,
                         onPreviousChapter: viewModel.previousChapter,
@@ -137,8 +139,10 @@ struct ReaderView: View {
                     )
                     .simultaneousGesture(DragGesture().onEnded({ value in
                         if userConfig.popupSwipeToDismiss &&
+                            viewModel.showPopup &&
                             (abs(value.translation.width) > CGFloat(userConfig.popupSwipeThreshold)) &&
                             (abs(value.translation.height) < 20) {
+                            clearHighlight.toggle()
                             viewModel.closePopup()
                         }
                     }))

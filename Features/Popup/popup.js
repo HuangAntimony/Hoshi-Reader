@@ -570,7 +570,7 @@ function renderStructuredContent(parent, node) {
     }
     
     if (node.data) {
-        // this is necessary to fix formatting in dicts like daijijsen
+        // this is necessary to fix formatting in dicts like daijisen
         for (const [k, v] of Object.entries(node.data)) {
             const isCJK = /^[\u3000-\u9FFF\uF900-\uFAFF]/.test(k);
             element.setAttribute(`data-sc${isCJK ? '' : '-'}${toKebabCase(k)}`, v);

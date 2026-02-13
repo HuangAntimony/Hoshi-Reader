@@ -36,28 +36,34 @@ struct AboutView: View {
             
             Section("Dependencies") {
                 LicenseRow(
-                    name: "AEXML",
+                    name: "AEXML (EPUBKit)",
                     license: "MIT",
                     url: "https://github.com/tadija/AEXML",
                     text: mitLicense(copyright: "Copyright (c) 2014-2024 Marko Tadić (https://markotadic.com)")
                 )
                 LicenseRow(
-                    name: "ZipArchive",
+                    name: "ZipArchive (EPUBKit)",
                     license: "MIT",
                     url: "https://github.com/ZipArchive/ZipArchive",
                     text: mitLicense(copyright: "Copyright (c) 2013-2021, ZipArchive, https://github.com/ZipArchive")
                 )
                 LicenseRow(
-                    name: "zip",
+                    name: "zip (yomitandicts-cpp)",
                     license: "MIT",
                     url: "https://github.com/kuba--/zip",
                     text: mitLicense(copyright: "All Rights Reserved")
                 )
                 LicenseRow(
-                    name: "zstd",
+                    name: "zstd (yomitandicts-cpp)",
                     license: "BSD-3",
                     url: "https://github.com/facebook/zstd",
                     text: bsdLicenseZstd
+                )
+                LicenseRow(
+                    name: "utfcpp (yomitandicts-cpp)",
+                    license: "BSL-1.0",
+                    url: "https://github.com/nemtrif/utfcpp",
+                    text: nil
                 )
                 LicenseRow(
                     name: "EPUBKit",

@@ -653,7 +653,7 @@ function createDeinflectionTag(tag) {
 
 function createFrequencyGroup(freqGroup) {
     const values = freqGroup.frequencies.map(f => f.displayValue || f.value).join(', ');
-    return el('span', { className: 'frequency-group' }, [
+    return el('span', { className: 'frequency-group', 'data-details': freqGroup.dictionary }, [
         el('span', { className: 'frequency-dict-label', textContent: freqGroup.dictionary }),
         el('span', { className: 'frequency-values', textContent: values })
     ]);
@@ -730,7 +730,7 @@ function createPitchHtml(reading, pitchValue) {
 }
 
 function createPitchGroup(pitchData, reading) {
-    const container = el('div', { className: 'pitch-group' });
+    const container = el('div', { className: 'pitch-group', 'data-details': pitchData.dictionary });
     container.appendChild(el('span', { className: 'pitch-dict-label', textContent: pitchData.dictionary }));
     
     const list = el('ul', { className: 'pitch-entries' });

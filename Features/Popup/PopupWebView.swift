@@ -100,11 +100,13 @@ struct PopupWebView: UIViewRepresentable {
     
     func updateUIView(_ webView: WKWebView, context: Context) {
         context.coordinator.onMine = onMine
-        if context.coordinator.currentContent != content {
-            context.coordinator.currentContent = content
-            let html = buildHTML(content: content)
-            webView.loadHTMLString(html, baseURL: nil)
+        guard !context.coordinator.wasLoaded else {
+            return
         }
+        context.coordinator.currentContent = content
+        context.coordinator.wasLoaded = true
+        let html = buildHTML(content: content)
+        webView.loadHTMLString(html, baseURL: nil)
     }
     
     static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
@@ -116,6 +118,7 @@ struct PopupWebView: UIViewRepresentable {
     class Coordinator: NSObject, WKScriptMessageHandler {
         var onMine: (([String: String]) -> Void)?
         var currentContent: String = ""
+        var wasLoaded: Bool = false
         
         init(onMine: (([String: String]) -> Void)?) {
             self.onMine = onMine

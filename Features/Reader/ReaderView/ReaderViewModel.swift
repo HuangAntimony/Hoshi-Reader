@@ -18,6 +18,15 @@ enum ActiveSheet: Identifiable {
     var id: Self { self }
 }
 
+struct PopupItem: Identifiable {
+    let id: UUID = UUID()
+    var showPopup: Bool
+    var currentSelection: SelectionData?
+    var lookupResults: [LookupResult] = []
+    var dictionaryStyles: [String: String] = [:]
+    var isVertical: Bool
+}
+
 @Observable
 @MainActor
 class ReaderLoaderViewModel {
@@ -69,10 +78,7 @@ class ReaderViewModel {
     let bridge = WebViewBridge()
     
     // lookups
-    var showPopup = false
-    var currentSelection: SelectionData?
-    var lookupResults: [LookupResult] = []
-    var dictionaryStyles: [String: String] = [:]
+    var popups: [PopupItem] = []
     
     // stats
     var isTracking = false
@@ -209,27 +215,22 @@ class ReaderViewModel {
     }
     
     func handleTextSelection(_ selection: SelectionData, maxResults: Int) -> Int? {
-        currentSelection = selection
-        lookupResults = LookupEngine.shared.lookup(selection.text, maxResults: maxResults)
-        dictionaryStyles = [:]
+        var currentSelection = selection
+        var lookupResults = LookupEngine.shared.lookup(selection.text, maxResults: maxResults)
+        var dictionaryStyles: [String: String] = [:]
         for style in LookupEngine.shared.getStyles() {
             dictionaryStyles[String(style.dict_name)] = String(style.styles)
         }
+        var popup = PopupItem(showPopup: false, currentSelection: currentSelection, lookupResults: lookupResults, dictionaryStyles: dictionaryStyles, isVertical: true)
+        popups.append(popup)
         
         if let firstResult = lookupResults.first {
             withAnimation(.default.speed(2)) {
-                showPopup = true
+                popups[popups.count - 1].showPopup = true
             }
             return String(firstResult.matched).count
         } else {
-            closePopup()
             return nil
-        }
-    }
-    
-    func closePopup() {
-        withAnimation(.default.speed(2)) {
-            showPopup = false
         }
     }
     

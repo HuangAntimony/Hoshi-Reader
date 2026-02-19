@@ -111,7 +111,7 @@ struct ReaderView: View {
                         onTextSelected: { selection in
                             viewModel.handleTextSelection(selection, maxResults: userConfig.maxResults)
                         },
-                        onTapOutside: viewModel.closePopup,
+                        onTapOutside: {},
                         onPageTurn: {
                             if userConfig.statisticsAutostartMode == .pageturn && !viewModel.isTracking {
                                 viewModel.startTracking()
@@ -129,26 +129,18 @@ struct ReaderView: View {
                         hideFurigana: userConfig.readerHideFurigana
                     ))
                     
-                    PopupView(
-                        isVisible: $viewModel.showPopup,
-                        selectionData: viewModel.currentSelection,
-                        lookupResults: viewModel.lookupResults,
-                        dictionaryStyles: viewModel.dictionaryStyles,
-                        screenSize: geometry.size,
-                        isVertical: userConfig.verticalWriting,
-                        coverURL: viewModel.coverURL,
-                        documentTitle: viewModel.document.title
-                    )
-                    .simultaneousGesture(DragGesture().onEnded({ value in
-                        if userConfig.popupSwipeToDismiss &&
-                            viewModel.showPopup &&
-                            (abs(value.translation.width) > CGFloat(userConfig.popupSwipeThreshold)) &&
-                            (abs(value.translation.height) < 20) {
-                            viewModel.clearWebHighlight()
-                            viewModel.closePopup()
-                        }
-                    }))
-                    .zIndex(100)
+                    ForEach($viewModel.popups.indices, id: \.self) { index in
+                        PopupView(isVisible: $viewModel.popups[index].showPopup,
+                                  selectionData: viewModel.popups[index].currentSelection,
+                                  lookupResults: viewModel.popups[index].lookupResults,
+                                  dictionaryStyles: viewModel.popups[index].dictionaryStyles,
+                                  screenSize: geometry.size,
+                                  isVertical: viewModel.popups[index].isVertical,
+                                  coverURL: viewModel.coverURL,
+                                  documentTitle: viewModel.document.title
+                        )
+                        .zIndex(Double(100 + index))
+                    }
                 }
             }
             
@@ -246,12 +238,12 @@ struct ReaderView: View {
                     viewModel.jumpToChapter(index: spineIndex)
                     viewModel.activeSheet = nil
                     viewModel.clearWebHighlight()
-                    viewModel.closePopup()
+                    //viewModel.closePopup()
                 } onJumpToCharacter: { count in
                     viewModel.jumpToCharacter(count)
                     viewModel.activeSheet = nil
                     viewModel.clearWebHighlight()
-                    viewModel.closePopup()
+                    //viewModel.closePopup()
                 }
             case .statistics:
                 StatisticsView(viewModel: viewModel)

@@ -109,6 +109,8 @@ struct PopupView: View {
     let isVertical: Bool
     let coverURL: URL?
     let documentTitle: String?
+    var onTextSelected: ((SelectionData) -> Int?)?
+    var onTapOutside: (() -> Void)?
     
     private var layout: PopupLayout? {
         guard let selectionData else {

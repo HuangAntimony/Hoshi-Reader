@@ -129,7 +129,7 @@ struct ReaderView: View {
                         hideFurigana: userConfig.readerHideFurigana
                     ))
                     
-                    ForEach($viewModel.popups.indices, id: \.self) { index in
+                    ForEach(Array(viewModel.popups.enumerated()), id: \.element.id) { index, _ in
                         PopupView(isVisible: $viewModel.popups[index].showPopup,
                                   selectionData: viewModel.popups[index].currentSelection,
                                   lookupResults: viewModel.popups[index].lookupResults,
@@ -137,7 +137,11 @@ struct ReaderView: View {
                                   screenSize: geometry.size,
                                   isVertical: viewModel.popups[index].isVertical,
                                   coverURL: viewModel.coverURL,
-                                  documentTitle: viewModel.document.title
+                                  documentTitle: viewModel.document.title,
+                                  onTextSelected: { selection in
+                                      viewModel.handleTextSelection(selection, maxResults: userConfig.maxResults)
+                                  },
+                                  onTapOutside: {},
                         )
                         .zIndex(Double(100 + index))
                     }

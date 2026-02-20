@@ -9,22 +9,12 @@
 
 import EPUBKit
 import SwiftUI
-import CYomitanDicts
 
 enum ActiveSheet: Identifiable {
     case appearance
     case chapters
     case statistics
     var id: Self { self }
-}
-
-struct PopupItem: Identifiable {
-    let id: UUID = UUID()
-    var showPopup: Bool
-    var currentSelection: SelectionData?
-    var lookupResults: [LookupResult] = []
-    var dictionaryStyles: [String: String] = [:]
-    var isVertical: Bool
 }
 
 @Observable
@@ -215,43 +205,15 @@ class ReaderViewModel {
     }
     
     func handleTextSelection(_ selection: SelectionData, maxResults: Int, isVertical: Bool) -> Int? {
-        let lookupResults = LookupEngine.shared.lookup(selection.text, maxResults: maxResults)
-        var dictionaryStyles: [String: String] = [:]
-        for style in LookupEngine.shared.getStyles() {
-            dictionaryStyles[String(style.dict_name)] = String(style.styles)
-        }
-        let popup = PopupItem(
-            showPopup: false,
-            currentSelection: selection,
-            lookupResults: LookupEngine.shared.lookup(selection.text, maxResults: maxResults),
-            dictionaryStyles: dictionaryStyles,
-            isVertical: isVertical
-        )
-        popups.append(popup)
-        
-        if let firstResult = lookupResults.first {
-            withAnimation(.default.speed(2.25)) {
-                popups[popups.count - 1].showPopup = true
-            }
-            return String(firstResult.matched).count
-        }
-        return nil
+        appendLookupPopup(to: &popups, selection: selection, maxResults: maxResults, isVertical: isVertical)
     }
     
     func closePopups() {
-        withAnimation(.default.speed(2.25)) {
-            for index in popups.indices {
-                popups[index].showPopup = false
-            }
-        }
+        closeLookupPopups(&popups)
     }
     
     func closeChildPopups(parent: Int) {
-        withAnimation(.default.speed(2.25)) {
-            for index in popups.indices.dropFirst(parent + 1) {
-                popups[index].showPopup = false
-            }
-        }
+        closeChildLookupPopups(&popups, parent: parent)
     }
     
     func clearWebHighlight() {

@@ -17,52 +17,7 @@ const DEFAULT_HARMONIC_RANK = '9999999';
 const SMALL_KANA_SET = new Set('ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ');
 const NUMERIC_TAG = /^\d+$/;
 const audioUrls = {};
-let currentAudio = null;
 let lastSelection = '';
-const WORD_AUDIO_PLAY_TIMEOUT_MS = 8000;
-let wordAudioPlayRequestId = 0;
-let latestAudioPlaybackAttemptId = 0;
-let activeWordAudioRequestId = null;
-const pendingWordAudioPlayRequests = new Map();
-
-function settleWordAudioPlayRequest(requestId, success) {
-    const pendingRequest = pendingWordAudioPlayRequests.get(requestId);
-    if (!pendingRequest) return;
-    clearTimeout(pendingRequest.timeoutId);
-    pendingRequest.resolve(Boolean(success));
-    pendingWordAudioPlayRequests.delete(requestId);
-}
-
-function rejectPendingWordAudioPlayRequests() {
-    const pendingRequestIds = Array.from(pendingWordAudioPlayRequests.keys());
-    for (const requestId of pendingRequestIds) {
-        settleWordAudioPlayRequest(requestId, false);
-    }
-    activeWordAudioRequestId = null;
-}
-
-function resolveWordAudioPlayRequest(requestId, success) {
-    settleWordAudioPlayRequest(requestId, success);
-    if (activeWordAudioRequestId === requestId) {
-        activeWordAudioRequestId = null;
-    }
-}
-
-window.__onNativeWordAudioResult = resolveWordAudioPlayRequest;
-
-function stopAudio() {
-    latestAudioPlaybackAttemptId += 1;
-    rejectPendingWordAudioPlayRequests();
-    if (currentAudio) {
-        if (typeof currentAudio.pause === 'function') {
-            currentAudio.pause();
-        }
-        if ('src' in currentAudio) {
-            currentAudio.src = '';
-        }
-        currentAudio = null;
-    }
-}
 
 function el(tag, props = {}, children = []) {
     const element = document.createElement(tag);
@@ -817,13 +772,13 @@ function createTags(entry) {
 async function fetchAudioUrl(expression, reading) {
     const templates = window.audioSources;
     if (!templates?.length) return null;
-
+    
     for (const template of templates) {
         const url = template
-            .replace('{term}', encodeURIComponent(expression))
-            .replace('{reading}', encodeURIComponent(reading));
+        .replace('{term}', encodeURIComponent(expression))
+        .replace('{reading}', encodeURIComponent(reading));
         try {
-            const response = await fetch(`proxy://?url=${encodeURIComponent(url)}`);
+            const response = await fetch(`audio://?url=${encodeURIComponent(url)}`);
             const data = await response.json();
             if (data.type === 'audioSourceList' && data.audioSources?.[0]?.url) {
                 return data.audioSources[0].url;
@@ -833,55 +788,27 @@ async function fetchAudioUrl(expression, reading) {
     return null;
 }
 
-function stopNativeWordAudio() {
-    const stopHandler = window.webkit?.messageHandlers?.stopWordAudio;
-    if (!stopHandler) return;
-    stopHandler.postMessage(null);
-}
-
-async function playWordAudio(audioUrl) {
+function playWordAudio(audioUrl) {
     const playHandler = window.webkit?.messageHandlers?.playWordAudio;
     if (!playHandler) {
         return false;
     }
-
-    if (activeWordAudioRequestId !== null) {
-        settleWordAudioPlayRequest(activeWordAudioRequestId, false);
+    
+    try {
+        playHandler.postMessage({
+            url: audioUrl,
+            mode: window.audioPlaybackMode || 'interrupt'
+        });
+        return true;
+    } catch {
+        return false;
     }
-
-    return await new Promise(resolve => {
-        const requestId = ++wordAudioPlayRequestId;
-        activeWordAudioRequestId = requestId;
-        const timeoutId = setTimeout(() => {
-            if (activeWordAudioRequestId === requestId) {
-                activeWordAudioRequestId = null;
-            }
-            settleWordAudioPlayRequest(requestId, false);
-        }, WORD_AUDIO_PLAY_TIMEOUT_MS);
-
-        pendingWordAudioPlayRequests.set(requestId, { resolve, timeoutId });
-
-        try {
-            playHandler.postMessage({
-                url: audioUrl,
-                mode: window.audioPlaybackMode || 'interrupt',
-                requestId
-            });
-        } catch {
-            if (activeWordAudioRequestId === requestId) {
-                activeWordAudioRequestId = null;
-            }
-            settleWordAudioPlayRequest(requestId, false);
-        }
-    });
 }
 
-function showAudioError(button, attemptId) {
+function showAudioError(button) {
     button.textContent = '✕';
     setTimeout(() => {
-        if (attemptId === latestAudioPlaybackAttemptId) {
-            button.textContent = '♪';
-        }
+        button.textContent = '♪';
     }, 1500);
 }
 
@@ -890,36 +817,15 @@ function createAudioButton(expression, reading, entryIndex) {
         className: 'audio-button',
         textContent: '♪',
         onclick: async () => {
-            const playbackAttemptId = ++latestAudioPlaybackAttemptId;
             if (!audioUrls[entryIndex]) {
                 audioUrls[entryIndex] = await fetchAudioUrl(expression, reading);
-                if (playbackAttemptId !== latestAudioPlaybackAttemptId) {
-                    return;
-                }
             }
-            if (audioUrls[entryIndex]) {
-                if (currentAudio) currentAudio.pause();
-                try {
-                    const didPlay = await playWordAudio(audioUrls[entryIndex]);
-                    if (playbackAttemptId !== latestAudioPlaybackAttemptId) {
-                        return;
-                    }
-                    if (!didPlay) {
-                        throw new Error('native playback failed');
-                    }
-                    currentAudio = { pause: stopNativeWordAudio };
-                } catch {
-                    if (playbackAttemptId !== latestAudioPlaybackAttemptId) {
-                        return;
-                    }
-                    currentAudio = null;
-                    showAudioError(button, playbackAttemptId);
-                }
-            } else {
-                if (playbackAttemptId !== latestAudioPlaybackAttemptId) {
-                    return;
-                }
-                showAudioError(button, playbackAttemptId);
+            if (!audioUrls[entryIndex]) {
+                showAudioError(button);
+                return;
+            }
+            if (!playWordAudio(audioUrls[entryIndex])) {
+                showAudioError(button);
             }
         }
     });

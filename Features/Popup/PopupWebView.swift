@@ -9,7 +9,7 @@
 import SwiftUI
 import WebKit
 
-class ProxyHandler: NSObject, WKURLSchemeHandler {
+class AudioHandler: NSObject, WKURLSchemeHandler {
     private var tasks = Set<ObjectIdentifier>()
     
     func webView(_ webView: WKWebView, start task: WKURLSchemeTask) {
@@ -87,8 +87,7 @@ struct PopupWebView: UIViewRepresentable {
         config.userContentController.add(context.coordinator, name: "mineEntry")
         config.userContentController.add(context.coordinator, name: "openLink")
         config.userContentController.add(context.coordinator, name: "playWordAudio")
-        config.userContentController.add(context.coordinator, name: "stopWordAudio")
-        config.setURLSchemeHandler(ProxyHandler(), forURLScheme: "proxy")
+        config.setURLSchemeHandler(AudioHandler(), forURLScheme: "audio")
         config.mediaTypesRequiringUserActionForPlayback = []
         
         let webView = WKWebView(frame: .zero, configuration: config)
@@ -110,12 +109,10 @@ struct PopupWebView: UIViewRepresentable {
     }
     
     static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
-        webView.evaluateJavaScript("stopAudio()")
         WordAudioPlayer.shared.stop()
         webView.configuration.userContentController.removeScriptMessageHandler(forName: "mineEntry")
         webView.configuration.userContentController.removeScriptMessageHandler(forName: "openLink")
         webView.configuration.userContentController.removeScriptMessageHandler(forName: "playWordAudio")
-        webView.configuration.userContentController.removeScriptMessageHandler(forName: "stopWordAudio")
     }
     
     class Coordinator: NSObject, WKScriptMessageHandler {
@@ -134,51 +131,12 @@ struct PopupWebView: UIViewRepresentable {
                let url = URL(string: urlString) {
                 UIApplication.shared.open(url)
             }
-            if message.name == "stopWordAudio" {
-                WordAudioPlayer.shared.stop()
+            if message.name == "playWordAudio",
+               let content = message.body as? [String: Any],
+               let urlString = content["url"] as? String {
+                let requestedMode = (content["mode"] as? String).flatMap(AudioPlaybackMode.init) ?? .interrupt
+                WordAudioPlayer.shared.play(urlString: urlString, requestedMode: requestedMode)
             }
-            
-            if message.name == "playWordAudio" {
-                let payload = message.body as? [String: Any]
-                let requestId = Self.parseWordAudioRequestId(payload?["requestId"])
-
-                guard let urlString = payload?["url"] as? String else {
-                    Task { @MainActor [weak webView = message.webView] in
-                        await Self.sendWordAudioResult(requestId: requestId, success: false, webView: webView)
-                    }
-                    return
-                }
-
-                let requestedMode = (payload?["mode"] as? String).flatMap(AudioPlaybackMode.init) ?? .interrupt
-                Task { @MainActor [weak webView = message.webView] in
-                    let success = await WordAudioPlayer.shared.play(
-                        urlString: urlString,
-                        requestedMode: requestedMode
-                    )
-                    await Self.sendWordAudioResult(requestId: requestId, success: success, webView: webView)
-                }
-            }
-        }
-
-        private static func parseWordAudioRequestId(_ value: Any?) -> Int? {
-            if let id = value as? Int {
-                return id
-            }
-            if let id = value as? NSNumber {
-                return id.intValue
-            }
-            return nil
-        }
-
-        @MainActor
-        private static func sendWordAudioResult(requestId: Int?, success: Bool, webView: WKWebView?) async {
-            guard let requestId, let webView else {
-                return
-            }
-            let successLiteral = success ? "true" : "false"
-            _ = try? await webView.evaluateJavaScript(
-                "window.__onNativeWordAudioResult(\(requestId), \(successLiteral));"
-            )
         }
     }
     

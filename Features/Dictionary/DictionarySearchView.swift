@@ -86,9 +86,13 @@ struct DictionarySearchView: View {
                 }
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
         .ignoresSafeArea()
-        .overlay(alignment: .bottom) {
+        .overlay(alignment: .top) {
+            LinearGradient(colors: [Color(.systemBackground), .clear], startPoint: .top, endPoint: .bottom)
+            .frame(height: UIApplication.topSafeArea + 50)
+            .ignoresSafeArea(edges: .top)
+        }
+        .safeAreaInset(edge: .top) {
             DictionarySearchBar(text: $query, isFocused: $searchFocused) {
                 runLookup()
             }
@@ -266,8 +270,8 @@ struct DictionarySearchView: View {
             window.needsAudio = \(AnkiManager.shared.needsAudio);
             window.customCSS = \(customCSS);
         </script>
-        <div id="entries-container"></div>
         <div style="height: 50px;"></div>
+        <div id="entries-container"></div>
         """
     }
 }
@@ -301,8 +305,7 @@ struct DictionarySearchBar: View {
             .padding(.vertical, 12)
             .glassEffect(.regular.interactive())
             .contentShape(Capsule())
-            .padding(.horizontal, 30)
-            .padding(.bottom, 4)
+            .padding(.horizontal, 20)
         }
         else {
             HStack(spacing: 10) {
@@ -326,9 +329,9 @@ struct DictionarySearchBar: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 12)
             .background(.ultraThinMaterial, in: Capsule())
+            .overlay(Capsule().stroke(Color.primary.opacity(0.2), lineWidth: 1))
             .contentShape(Capsule())
             .padding(.horizontal, 20)
-            .padding(.bottom, 4)
         }
     }
 }

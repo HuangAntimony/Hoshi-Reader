@@ -94,7 +94,6 @@ struct BookshelfView: View {
                         initialAutofocus: dictionaryRoute.autofocus
                     )
                     .id(dictionaryRoute.id)
-                    .navigationTitle("Dictionary")
                 }
             }
             

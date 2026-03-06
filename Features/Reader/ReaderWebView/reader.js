@@ -237,42 +237,18 @@ window.hoshiReader = {
     
     jumpToFragment(fragment) {
         var context = this.getScrollContext();
-        
-        if (context.pageSize <= 0) {
-            this.registerSnapScroll(0);
-            this.notifyRestoreComplete();
-            return false;
-        }
-        
         var rawFragment = (fragment || '').trim();
-        if (rawFragment.startsWith('#')) {
-            rawFragment = rawFragment.slice(1);
-        }
-        if (!rawFragment) {
-            this.registerSnapScroll(0);
-            this.notifyRestoreComplete();
-            return false;
-        }
+        var target = rawFragment && (document.getElementById(rawFragment) || document.getElementsByName(rawFragment)[0]);
         
-        try {
-            rawFragment = decodeURIComponent(rawFragment);
-        } catch (_) {}
-        
-        var target = document.getElementById(rawFragment) ||
-            document.getElementsByName(rawFragment)[0];
-        if (!target && window.CSS?.escape) {
-            target = document.querySelector(`[id="${CSS.escape(rawFragment)}"]`) ||
-                document.querySelector(`[name="${CSS.escape(rawFragment)}"]`);
-        }
-        
-        if (!target) {
+        if (context.pageSize <= 0 || !target) {
             this.registerSnapScroll(0);
             this.notifyRestoreComplete();
             return false;
         }
         
         var rect = target.getBoundingClientRect();
-        var anchor = (context.vertical ? rect.top : rect.left) + (context.vertical ? context.scrollEl.scrollTop : context.scrollEl.scrollLeft);
+        var currentScroll = context.vertical ? context.scrollEl.scrollTop : context.scrollEl.scrollLeft;
+        var anchor = (context.vertical ? rect.top : rect.left) + currentScroll;
         var targetScroll = this.alignToPage(context, anchor);
         
         this.setScrollOffset(context, targetScroll);
@@ -282,6 +258,7 @@ window.hoshiReader = {
             this.registerSnapScroll(targetScroll);
             this.notifyRestoreComplete();
         });
+        
         return true;
-    },
+    }
 };

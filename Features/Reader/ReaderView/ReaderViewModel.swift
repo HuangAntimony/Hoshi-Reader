@@ -423,6 +423,7 @@ class ReaderViewModel {
     
     static private func formattedDate(date: Date) -> String {
         let formatter = ISO8601DateFormatter()
+        formatter.timeZone = TimeZone.current
         formatter.formatOptions = [.withFullDate]
         return formatter.string(from: date)
     }

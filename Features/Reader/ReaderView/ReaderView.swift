@@ -16,6 +16,7 @@ struct WebViewState: Hashable {
     var hideFurigana: Bool
     var horizontalPadding: Int
     var verticalPadding: Int
+    var avoidPageBreak: Bool
     var layoutAdvanced: Bool
     var lineHeight: Double
     var characterSpacing: Double
@@ -142,6 +143,7 @@ struct ReaderView: View {
                         hideFurigana: userConfig.readerHideFurigana,
                         horizontalPadding: userConfig.horizontalPadding,
                         verticalPadding: userConfig.verticalPadding,
+                        avoidPageBreak: userConfig.avoidPageBreak,
                         layoutAdvanced: userConfig.layoutAdvanced,
                         lineHeight: userConfig.lineHeight,
                         characterSpacing: userConfig.characterSpacing,

@@ -257,6 +257,16 @@ struct ReaderWebView: UIViewRepresentable {
                 }
             }
             
+            var pageBreakCss = ""
+            if parent.userConfig.avoidPageBreak {
+                pageBreakCss = """
+                p {
+                    break-inside: avoid !important;
+                    -webkit-column-break-inside: avoid !important;
+                }
+                """
+            }
+            
             var textSpacingCss = ""
             if parent.userConfig.layoutAdvanced {
                 textSpacingCss = """
@@ -312,6 +322,7 @@ struct ReaderWebView: UIViewRepresentable {
             a {
                 color: rgba(66, 108, 245, 1) !important;
             }
+            \(pageBreakCss)
             \(textColorCss)
             """
             

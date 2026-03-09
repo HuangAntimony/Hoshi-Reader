@@ -134,6 +134,8 @@ struct AppearanceView: View {
                             .labelsHidden()
                     }
                     
+                    Toggle("Avoid Page Break", isOn: $userConfig.avoidPageBreak)
+                    
                     Toggle("Advanced", isOn: $userConfig.layoutAdvanced)
                     if userConfig.layoutAdvanced {
                         VStack {

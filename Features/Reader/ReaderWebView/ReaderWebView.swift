@@ -309,6 +309,9 @@ struct ReaderWebView: UIViewRepresentable {
                 background-color: rgba(160, 160, 160, 0.4) !important;
                 color: inherit;
             }
+            a {
+                color: rgba(66, 108, 245, 1) !important;
+            }
             \(textColorCss)
             """
             

@@ -340,11 +340,17 @@ class DictionaryManager {
                     
                     await MainActor.run {
                         self.loadDictionaries()
-                        if let currentIndex = self.getDictionaryIndex(title: dictionary.index.title, type: type) {
-                            self.deleteDictionary(indexSet: IndexSet(integer: currentIndex), type: type)
-                            let importedIndex = self.getDictionaryIndex(title: String(importResult.title), type: type)!
-                            self.moveDictionary(from: IndexSet(integer: importedIndex), to: currentIndex, type: type)
-                            AnkiManager.shared.updateHandlebar(old: dictionary.index.title, new: String(importResult.title))
+                        let old = dictionary.index.title
+                        let new = String(importResult.title)
+                        if old != new {
+                            if let currentIndex = self.getDictionaryIndex(title: old, type: type) {
+                                self.deleteDictionary(indexSet: IndexSet(integer: currentIndex), type: type)
+                                let importedIndex = self.getDictionaryIndex(title: new, type: type)!
+                                self.moveDictionary(from: IndexSet(integer: importedIndex), to: currentIndex, type: type)
+                                AnkiManager.shared.updateHandlebar(old: old, new: new)
+                            }
+                        } else {
+                            self.rebuildLookupQuery()
                         }
                     }
                 }

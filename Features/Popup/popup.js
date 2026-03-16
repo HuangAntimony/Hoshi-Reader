@@ -589,15 +589,63 @@ function createDefinitionImage(data, dictionary, exporting = false) {
         imageContainer.title = title;
     }
     
-    const image = document.createElement('img');
-    image.classList.add('gloss-image');
-    image.alt = nodeData?.alt || title || '';
     if (!exporting) {
-        image.src = `image://?dictionary=${encodeURIComponent(dictionary)}&path=${encodeURIComponent(path)}`;
+        const imageUrl = `image://?dictionary=${encodeURIComponent(dictionary)}&path=${encodeURIComponent(path)}`;
+        if (/\.svg$/i.test(path)) {
+            const canvas = document.createElement('canvas');
+            canvas.classList.add('gloss-image');
+            canvas.setAttribute('role', 'img');
+            canvas.setAttribute('aria-label', nodeData?.alt || title || '');
+            
+            const sourceImage = new Image();
+            sourceImage.addEventListener('load', () => {
+                renderDefinitionImageToCanvas(canvas, sourceImage, usedWidth, invAspectRatio, appearance);
+            }, {once: true});
+            sourceImage.src = imageUrl;
+            
+            imageContainer.appendChild(canvas);
+        } else {
+            const image = document.createElement('img');
+            image.classList.add('gloss-image');
+            image.alt = nodeData?.alt || title || '';
+            image.src = imageUrl;
+            imageContainer.appendChild(image);
+        }
+    } else {
+        const image = document.createElement('img');
+        image.classList.add('gloss-image');
+        image.alt = nodeData?.alt || title || '';
+        imageContainer.appendChild(image);
+    }
+    return node;
+}
+
+// ai slop
+function renderDefinitionImageToCanvas(canvas, image, usedWidth, invAspectRatio, appearance) {
+    const emSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 15;
+    const scaleFactor = Math.max(2, Math.ceil((window.devicePixelRatio || 1) * 2));
+    const cssWidth = Math.max(1, usedWidth * emSize);
+    const cssHeight = Math.max(1, cssWidth * invAspectRatio);
+    
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.width = Math.max(1, Math.round(cssWidth * scaleFactor));
+    canvas.height = Math.max(1, Math.round(cssHeight * scaleFactor));
+    
+    const context = canvas.getContext('2d');
+    if (!context) {
+        return;
     }
     
-    imageContainer.appendChild(image);
-    return node;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    
+    if (appearance === 'monochrome') {
+        context.globalCompositeOperation = 'source-in';
+        context.fillStyle = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ? '#ffffff' : '#000000';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.globalCompositeOperation = 'source-over';
+    }
 }
 
 // https://github.com/yomidevs/yomitan/blob/c0abb9e98a15aeb6b6f8f6e2d91fe5e54240b54a/ext/js/data/anki-note-data-creator.js#L177-L221

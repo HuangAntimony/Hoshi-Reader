@@ -203,9 +203,14 @@ a {
     font-size: 0;
 }
 
-.gloss-image-link[data-appearance="monochrome"] .gloss-image {
-    --shadow-settings: 0 0 0.01px var(--text-color);
-    filter: grayscale(1) opacity(0.5) drop-shadow(var(--shadow-settings)) drop-shadow(var(--shadow-settings)) saturate(1000%) brightness(1000%);
+.gloss-image-link[data-appearance="monochrome"] img.gloss-image {
+    filter: brightness(0);
+}
+
+@media (prefers-color-scheme: dark) {
+    .gloss-image-link[data-appearance="monochrome"] img.gloss-image {
+        filter: brightness(0) invert(1);
+    }
 }
 
 .gloss-image-link[data-size-units=em] .gloss-image-container {

@@ -591,7 +591,7 @@ function createDefinitionImage(data, dictionary, exporting = false) {
     
     if (!exporting) {
         const imageUrl = `image://?dictionary=${encodeURIComponent(dictionary)}&path=${encodeURIComponent(path)}`;
-        if (/\.svg$/i.test(path)) {
+        if (shouldRenderDefinitionImageToCanvas(path, appearance, usedWidth, invAspectRatio)) {
             const canvas = document.createElement('canvas');
             canvas.classList.add('gloss-image');
             canvas.setAttribute('role', 'img');
@@ -621,16 +621,26 @@ function createDefinitionImage(data, dictionary, exporting = false) {
 }
 
 // ai slop
+function shouldRenderDefinitionImageToCanvas(path, appearance, usedWidth, invAspectRatio) {
+    return /\.svg$/i.test(path) && appearance === 'monochrome' && usedWidth <= 4 && (usedWidth * invAspectRatio) <= 4;
+}
+
 function renderDefinitionImageToCanvas(canvas, image, usedWidth, invAspectRatio, appearance) {
-    const emSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 15;
-    const scaleFactor = Math.max(2, Math.ceil((window.devicePixelRatio || 1) * 2));
-    const cssWidth = Math.max(1, usedWidth * emSize);
-    const cssHeight = Math.max(1, cssWidth * invAspectRatio);
+    const emSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const scaleFactor = Math.ceil(window.devicePixelRatio * 2);
+    const pixelWidth = Math.round(usedWidth * emSize * scaleFactor);
+    const pixelHeight = Math.round(usedWidth * emSize * invAspectRatio * scaleFactor);
+    const maxCanvasSize = 128;
+    const scale = Math.min(
+                           1,
+                           maxCanvasSize / Math.max(pixelWidth, pixelHeight),
+                           Math.sqrt((maxCanvasSize * maxCanvasSize) / (pixelWidth * pixelHeight))
+                           );
     
     canvas.style.width = '100%';
     canvas.style.height = '100%';
-    canvas.width = Math.max(1, Math.round(cssWidth * scaleFactor));
-    canvas.height = Math.max(1, Math.round(cssHeight * scaleFactor));
+    canvas.width = Math.round(pixelWidth * scale);
+    canvas.height = Math.round(pixelHeight * scale);
     
     const context = canvas.getContext('2d');
     if (!context) {

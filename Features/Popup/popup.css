@@ -8,6 +8,9 @@
  *  SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+/* A big portion of the CSS was directly copied from Yomitan */
+/* https://github.com/yomidevs/yomitan/blob/d810b2f0842536d24ab82b6cd75d00841710e57b/ext/css/structured-content.css */
+
 * {
     margin: 0;
     padding: 0;
@@ -18,11 +21,23 @@ html,
 body {
     --font-size-no-units: 15;
     --line-height: 1.4;
+    --list-padding1: 1.4em;
+    --list-padding2: var(--list-padding1);
+    --text-color-light1: #555555;
+    --text-color-light2: #666666;
+    --text-color-light3: #777777;
+    --text-color-light4: #888888;
+    --background-color-dark1: #eeeeee;
     color: var(--text-color);
     background-color: transparent;
     font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif !important;
-    padding: 0 6px;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+}
+
+body {
     overflow-x: hidden;
+    padding: 0 10px;
 }
 
 .entry {
@@ -130,7 +145,6 @@ a {
     color: rgba(66, 108, 245, 1);
 }
 
-/* https://github.com/yomidevs/yomitan/blob/d810b2f0842536d24ab82b6cd75d00841710e57b/ext/css/structured-content.css#L19 */
 .gloss-image-container {
     display: inline-block;
     white-space: nowrap;
@@ -217,6 +231,10 @@ a {
     font-size: 1em;
 }
 
+.glossary-group {
+    position: relative;
+}
+
 .glossary-group summary {
     list-style: none;
 }
@@ -271,20 +289,29 @@ a {
     line-height: 1;
 }
 
-.glossary-group > div[data-dictionary] table {
+.gloss-sc-table-container {
+    display: block;
+}
+
+.gloss-sc-table {
     table-layout: auto;
     border-collapse: collapse;
 }
 
-.glossary-group > div[data-dictionary] th,
-.glossary-group > div[data-dictionary] td {
-    border: 1px solid currentColor;
-    padding: 0.25em;
-    vertical-align: top;
+.gloss-sc-thead,
+.gloss-sc-tfoot,
+.gloss-sc-th {
+    font-weight: bold;
+    background-color: var(--background-color-dark1);
 }
 
-.glossary-group > div[data-dictionary] th {
-    font-weight: bold;
+.gloss-sc-th,
+.gloss-sc-td {
+    border-width: calc(1em / var(--font-size-no-units));
+    border-style: solid;
+    border-color: var(--text-color-light2);
+    padding: 0.25em;
+    vertical-align: top;
 }
 
 .glossary-content {
@@ -388,6 +415,11 @@ a {
         --background-color: #000;
         --background-color-light: #000;
         --text-color: #fff;
+        --text-color-light1: #aaaaaa;
+        --text-color-light2: #999999;
+        --text-color-light3: #888888;
+        --text-color-light4: #777777;
+        --background-color-dark1: #333333;
     }
 
     .overlay {

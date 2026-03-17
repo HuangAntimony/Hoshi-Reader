@@ -799,7 +799,10 @@ function renderStructuredContent(parent, node, language = null, dictName = null,
     }
     
     if (node.type === 'structured-content') {
-        renderStructuredContent(parent, node.content, language, dictName, exporting);
+        const container = document.createElement('span');
+        container.classList.add('structured-content');
+        parent.appendChild(container);
+        renderStructuredContent(container, node.content, language, dictName, exporting);
         return;
     }
     
@@ -857,6 +860,14 @@ function renderStructuredContent(parent, node, language = null, dictName = null,
     
     if (node.rowSpan) {
         element.setAttribute('rowspan', node.rowSpan);
+    }
+    
+    if (tagName === 'table') {
+        const container = document.createElement('div');
+        container.classList.add('gloss-sc-table-container');
+        container.appendChild(element);
+        parent.appendChild(container);
+        return;
     }
     
     parent.appendChild(element);

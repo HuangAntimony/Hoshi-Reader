@@ -12,6 +12,7 @@ struct ShelfView: View {
     @Environment(\.colorScheme) private var systemColorScheme
     @Environment(UserConfig.self) var userConfig
     @State private var selectedBook: BookMetadata?
+    @State private var readerWindow = ReaderWindow()
     @State private var isCollapsed = true
     @State private var compactRowCount = 4
     var viewModel: BookshelfViewModel
@@ -110,13 +111,17 @@ struct ShelfView: View {
                 .padding(.horizontal)
             }
         }
-        .navigationDestination(item: $selectedBook) { book in
-            ReaderLoader(book: book)
-                .preferredColorScheme(userConfig.theme == .custom ? userConfig.uiTheme.colorScheme : (userConfig.theme.colorScheme ?? systemColorScheme))
-                .toolbar(.hidden, for: .tabBar)
-        }
         .onChange(of: selectedBook) { old, new in
-            if old != nil && new == nil {
+            if let book = new {
+                readerWindow.present(content: {
+                    ReaderLoader(book: book)
+                        .environment(userConfig)
+                        .preferredColorScheme(userConfig.theme == .custom ? userConfig.uiTheme.colorScheme : (userConfig.theme.colorScheme ?? systemColorScheme))
+                }) {
+                    selectedBook = nil
+                }
+            } else if old != nil {
+                readerWindow.dismiss()
                 viewModel.loadBooks()
             }
         }

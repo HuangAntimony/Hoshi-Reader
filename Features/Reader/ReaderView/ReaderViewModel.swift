@@ -44,6 +44,7 @@ class ReaderLoaderViewModel {
     
     init(book: BookMetadata) {
         self.book = book
+        loadBook()
     }
     
     func loadBook() {

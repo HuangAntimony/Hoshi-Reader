@@ -33,28 +33,19 @@ struct ReaderLoader: View {
     }
     
     var body: some View {
-        Group {
-            if let doc = viewModel.document, let root = viewModel.rootURL {
-                ReaderView(document: doc, rootURL: root, enableStatistics: userConfig.enableStatistics, autostartStatistics: userConfig.statisticsAutostartMode == .on)
-                    .interactiveDismissDisabled()
-            } else {
-                ProgressView()
-                    .onAppear {
-                        viewModel.loadBook()
-                }
-            }
+        if let doc = viewModel.document, let root = viewModel.rootURL {
+            ReaderView(document: doc, rootURL: root, enableStatistics: userConfig.enableStatistics, autostartStatistics: userConfig.statisticsAutostartMode == .on)
         }
-        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
 struct ReaderView: View {
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.dismissReader) private var dismissReader
     @Environment(\.colorScheme) private var systemColorScheme
     @Environment(\.scenePhase) private var scenePhase
     @Environment(UserConfig.self) private var userConfig
     @State private var viewModel: ReaderViewModel
-    @State private var topSafeArea: CGFloat = 0
+    @State private var topSafeArea: CGFloat = UIApplication.topSafeArea
     @State private var focusMode = false
     
     private let webViewPadding: CGFloat = 4
@@ -205,7 +196,7 @@ struct ReaderView: View {
                         if viewModel.isTracking {
                             viewModel.stopTracking()
                         }
-                        dismiss()
+                        dismissReader?()
                     }
                     .opacity(focusMode ? 0 : 1)
                 
@@ -247,11 +238,6 @@ struct ReaderView: View {
             }
         }
         .background(readerBackgroundColor)
-        .onAppear {
-            if topSafeArea == 0 {
-                topSafeArea = UIApplication.topSafeArea
-            }
-        }
         .overlay(alignment: .top) {
             VStack {
                 if !focusMode {
@@ -339,7 +325,6 @@ struct ReaderView: View {
                 viewModel.isPaused = true
             }
         }
-        .navigationBarBackButtonHidden(true)
         .ignoresSafeArea(edges: .top)
         .ignoresSafeArea(.keyboard)
         .statusBarHidden(focusMode)

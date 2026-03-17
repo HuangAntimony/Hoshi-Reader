@@ -110,9 +110,10 @@ struct ShelfView: View {
                 .padding(.horizontal)
             }
         }
-        .fullScreenCover(item: $selectedBook) { book in
+        .navigationDestination(item: $selectedBook) { book in
             ReaderLoader(book: book)
                 .preferredColorScheme(userConfig.theme == .custom ? userConfig.uiTheme.colorScheme : (userConfig.theme.colorScheme ?? systemColorScheme))
+                .toolbar(.hidden, for: .tabBar)
         }
         .onChange(of: selectedBook) { old, new in
             if old != nil && new == nil {

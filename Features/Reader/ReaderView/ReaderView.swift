@@ -41,9 +41,10 @@ struct ReaderLoader: View {
                 ProgressView()
                     .onAppear {
                         viewModel.loadBook()
-                    }
+                }
             }
         }
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 

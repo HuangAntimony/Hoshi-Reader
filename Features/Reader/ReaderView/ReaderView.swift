@@ -64,6 +64,7 @@ struct ReaderView: View {
     private var readerTextColor: String? {
         userConfig.theme == .custom ? UIColor(userConfig.customTextColor).hexString : nil
     }
+
     
     init(document: EPUBDocument, rootURL: URL, enableStatistics: Bool, autostartStatistics: Bool) {
         _viewModel = State(initialValue: ReaderViewModel(document: document, rootURL: rootURL, enableStatistics: enableStatistics, autostartStatistics: autostartStatistics))
@@ -238,7 +239,7 @@ struct ReaderView: View {
                         if let title = viewModel.document.title {
                             Text(title)
                                 .font(.subheadline)
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(userConfig.theme == .custom ? AnyShapeStyle(userConfig.customInfoColor.opacity(0.5)) : AnyShapeStyle(.tertiary))
                                 .padding(.horizontal, 30)
                                 .lineLimit(1)
                         }
@@ -246,7 +247,7 @@ struct ReaderView: View {
                     if userConfig.readerShowProgressTop && !progressString.isEmpty {
                         Text(progressString)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(userConfig.theme == .custom ? AnyShapeStyle(userConfig.customInfoColor) : AnyShapeStyle(.secondary))
                             .monospacedDigit()
                             .tracking(-0.4)
                     }
@@ -260,12 +261,12 @@ struct ReaderView: View {
                     if userConfig.enableStatistics && !statisticsString.isEmpty {
                         Text(statisticsString)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(userConfig.theme == .custom ? AnyShapeStyle(userConfig.customInfoColor) : AnyShapeStyle(.secondary))
                     }
                     if !userConfig.readerShowProgressTop && !progressString.isEmpty {
                         Text(progressString)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(userConfig.theme == .custom ? AnyShapeStyle(userConfig.customInfoColor) : AnyShapeStyle(.secondary))
                     }
                 }
             }

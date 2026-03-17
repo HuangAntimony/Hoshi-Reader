@@ -37,6 +37,7 @@ struct AppearanceView: View {
                         }
                         ColorPicker("Background Color", selection: $userConfig.customBackgroundColor)
                         ColorPicker("Text Color", selection: $userConfig.customTextColor)
+                        ColorPicker("Info Color", selection: $userConfig.customInfoColor)
                     }
                 }
                 

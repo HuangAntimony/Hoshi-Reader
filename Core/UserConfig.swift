@@ -87,6 +87,10 @@ class UserConfig {
         didSet { Self.saveColor(customTextColor, key: "customTextColor") }
     }
     
+    var customInfoColor: Color {
+        didSet { Self.saveColor(customInfoColor, key: "customInfoColor") }
+    }
+    
     var verticalWriting: Bool {
         didSet { UserDefaults.standard.set(verticalWriting, forKey: "verticalWriting") }
     }
@@ -257,6 +261,7 @@ class UserConfig {
             .flatMap(Themes.init) ?? .system
         self.customBackgroundColor = UserConfig.loadColor(key: "customBackgroundColor") ?? Color(.sRGB, red: 1, green: 1, blue: 1)
         self.customTextColor = UserConfig.loadColor(key: "customTextColor") ?? Color(.sRGB, red: 0, green: 0, blue: 0)
+        self.customInfoColor = UserConfig.loadColor(key: "customInfoColor") ?? Color(.sRGB, red: 0.6, green: 0.6, blue: 0.6)
         
         self.verticalWriting = defaults.object(forKey: "verticalWriting") as? Bool ?? true
         self.selectedFont = defaults.string(forKey: "selectedFont") ?? "Hiragino Mincho ProN"

@@ -118,6 +118,7 @@ struct ReaderView: View {
                         },
                         onTapOutside: viewModel.closePopups,
                         onPageTurn: {
+                            viewModel.closePopups()
                             if userConfig.statisticsAutostartMode == .pageturn && !viewModel.isTracking {
                                 viewModel.startTracking()
                             }

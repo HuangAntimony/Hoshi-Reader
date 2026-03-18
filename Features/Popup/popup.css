@@ -235,21 +235,21 @@ a {
     position: relative;
 }
 
-.glossary-group summary {
+.glossary-group > summary {
     list-style: none;
 }
 
-.glossary-group summary::-webkit-details-marker {
+.glossary-group > summary::-webkit-details-marker {
     display: none;
 }
 
-.glossary-group summary::before {
+.glossary-group > summary::before {
     content: '▶ ';
     font-size: 8px;
     opacity: 0.5;
 }
 
-.glossary-group[open] summary::before {
+.glossary-group[open] > summary::before {
     content: '▼ ';
 }
 

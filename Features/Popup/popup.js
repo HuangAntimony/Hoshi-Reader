@@ -531,6 +531,7 @@ function createDefinitionImage(data, dictionary, exporting = false) {
     
     const hasPreferredWidth = (typeof preferredWidth === 'number');
     const hasPreferredHeight = (typeof preferredHeight === 'number');
+    const hasDimensions = (hasPreferredWidth || hasPreferredHeight || typeof data.width === 'number' || typeof data.height === 'number');
     const invAspectRatio = (
                             hasPreferredWidth && hasPreferredHeight ?
                             preferredHeight / preferredWidth :
@@ -592,24 +593,13 @@ function createDefinitionImage(data, dictionary, exporting = false) {
     if (!exporting) {
         const imageUrl = `image://?dictionary=${encodeURIComponent(dictionary)}&path=${encodeURIComponent(path)}`;
         if (shouldRenderDefinitionImageToCanvas(path, appearance, usedWidth, invAspectRatio)) {
-            const canvas = document.createElement('canvas');
-            canvas.classList.add('gloss-image');
-            canvas.setAttribute('role', 'img');
-            canvas.setAttribute('aria-label', nodeData?.alt || title || '');
-            
-            const sourceImage = new Image();
-            sourceImage.addEventListener('load', () => {
+            imageContainer.appendChild(createDefinitionImageCanvas(imageUrl, nodeData?.alt || title || '', (canvas, sourceImage) => {
                 renderDefinitionImageToCanvas(canvas, sourceImage, usedWidth, invAspectRatio, appearance);
-            }, {once: true});
-            sourceImage.src = imageUrl;
-            
-            imageContainer.appendChild(canvas);
+            }));
         } else {
-            const image = document.createElement('img');
-            image.classList.add('gloss-image');
-            image.alt = nodeData?.alt || title || '';
-            image.src = imageUrl;
-            imageContainer.appendChild(image);
+            imageContainer.appendChild(createDefinitionImageCanvas(imageUrl, nodeData?.alt || title || '', (canvas, sourceImage) => {
+                renderRasterDefinitionImageToCanvas(canvas, sourceImage, imageContainer, aspectRatioSizer, hasDimensions);
+            }));
         }
     } else {
         const image = document.createElement('img');
@@ -623,6 +613,21 @@ function createDefinitionImage(data, dictionary, exporting = false) {
 // ai slop
 function shouldRenderDefinitionImageToCanvas(path, appearance, usedWidth, invAspectRatio) {
     return /\.svg$/i.test(path) && appearance === 'monochrome' && usedWidth <= 4 && (usedWidth * invAspectRatio) <= 4;
+}
+
+function createDefinitionImageCanvas(imageUrl, alt, onLoad) {
+    const canvas = document.createElement('canvas');
+    canvas.classList.add('gloss-image');
+    canvas.setAttribute('role', 'img');
+    canvas.setAttribute('aria-label', alt);
+    
+    const sourceImage = new Image();
+    sourceImage.addEventListener('load', () => {
+        onLoad(canvas, sourceImage);
+    }, {once: true});
+    sourceImage.src = imageUrl;
+    
+    return canvas;
 }
 
 function renderDefinitionImageToCanvas(canvas, image, usedWidth, invAspectRatio, appearance) {
@@ -656,6 +661,30 @@ function renderDefinitionImageToCanvas(canvas, image, usedWidth, invAspectRatio,
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.globalCompositeOperation = 'source-over';
     }
+}
+
+function renderRasterDefinitionImageToCanvas(canvas, image, imageContainer, aspectRatioSizer, hasDimensions) {
+    if (!hasDimensions) {
+        imageContainer.style.width = `${Math.min(image.naturalWidth, window.innerWidth - 20)}px`;
+    }
+    
+    const invAspectRatio = image.naturalHeight / image.naturalWidth;
+    const scaleFactor = Math.ceil(window.devicePixelRatio);
+    
+    aspectRatioSizer.style.paddingTop = `${invAspectRatio * 100}%`;
+    
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.width = Math.round(imageContainer.clientWidth * scaleFactor);
+    canvas.height = Math.round(imageContainer.clientWidth * invAspectRatio * scaleFactor);
+    
+    const context = canvas.getContext('2d');
+    if (!context) {
+        return;
+    }
+    
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
 }
 
 // https://github.com/yomidevs/yomitan/blob/c0abb9e98a15aeb6b6f8f6e2d91fe5e54240b54a/ext/js/data/anki-note-data-creator.js#L177-L221

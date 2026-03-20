@@ -128,7 +128,7 @@ struct BookshelfView: View {
                         Button {
                             showAnkiSettings = true
                         } label: {
-                            Label("Anki Integration", systemImage: "tray.full")
+                            Label("Anki", systemImage: "tray.full")
                         }
                         .foregroundStyle(.primary)
                         Button {

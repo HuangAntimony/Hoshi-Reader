@@ -27,6 +27,10 @@ struct AnkiView: View {
         List {
             Section {
                 Button("Fetch decks and models from Anki") { ankiManager.requestInfo() }
+            } footer: {
+                if !ankiManager.isConnected {
+                    Text("AnkiMobile is required to mine words.")
+                }
             }
             
             if ankiManager.isConnected {

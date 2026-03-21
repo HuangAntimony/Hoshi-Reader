@@ -72,18 +72,20 @@ window.hoshiReader = {
         var vertical = this.isVertical();
         var pageHeight = this.pageHeight;
         var pageWidth = this.pageWidth;
-        window.addEventListener('scroll', function () {
+        document.body.addEventListener('scroll', function () {
             if (vertical) {
-                var snappedScroll = Math.round(window.scrollY / pageHeight) * pageHeight;
-                if (Math.abs(window.scrollY - snappedScroll) > 1) {
-                    window.scrollTo(0, window.lastPageScroll);
+                var currentScroll = document.body.scrollTop;
+                var snappedScroll = Math.round(currentScroll / pageHeight) * pageHeight;
+                if (Math.abs(currentScroll - snappedScroll) > 1) {
+                    document.body.scrollTop = window.lastPageScroll;
                 } else {
                     window.lastPageScroll = snappedScroll;
                 }
             } else {
-                var snappedScroll = Math.round(window.scrollX / pageWidth) * pageWidth;
-                if (Math.abs(window.scrollX - snappedScroll) > 1) {
-                    window.scrollTo(window.lastPageScroll, 0);
+                var currentScroll = document.body.scrollLeft;
+                var snappedScroll = Math.round(currentScroll / pageWidth) * pageWidth;
+                if (Math.abs(currentScroll - snappedScroll) > 1) {
+                    document.body.scrollLeft = window.lastPageScroll;
                 } else {
                     window.lastPageScroll = snappedScroll;
                 }
@@ -112,7 +114,7 @@ window.hoshiReader = {
     
     getScrollContext() {
         var vertical = this.isVertical();
-        var scrollEl = document.scrollingElement || document.documentElement || document.body;
+        var scrollEl = document.body;
         var pageSize = vertical ? this.pageHeight : this.pageWidth;
         var totalSize = vertical ? scrollEl.scrollHeight : scrollEl.scrollWidth;
         var maxScroll = Math.max(0, totalSize - pageSize);
@@ -123,10 +125,8 @@ window.hoshiReader = {
         var clampedScroll = Math.min(Math.max(0, scroll), context.maxScroll);
         if (context.vertical) {
             context.scrollEl.scrollTop = clampedScroll;
-            window.scrollTo(0, clampedScroll);
         } else {
             context.scrollEl.scrollLeft = clampedScroll;
-            window.scrollTo(clampedScroll, 0);
         }
         return clampedScroll;
     },
@@ -148,16 +148,16 @@ window.hoshiReader = {
             var totalSize = vertical ? document.body.scrollHeight : document.body.scrollWidth;
             var maxScroll = Math.max(0, totalSize - pageSize);
             var maxAlignedScroll = Math.floor(maxScroll / pageSize) * pageSize;
-            var currentScroll = vertical ? window.scrollY : window.scrollX;
+            var currentScroll = vertical ? document.body.scrollTop : document.body.scrollLeft;
             if ((currentScroll + pageSize) <= (maxAlignedScroll + 1)) {
-                if (vertical) { window.scrollBy(0, pageSize); } else { window.scrollBy(pageSize, 0); }
+                if (vertical) { document.body.scrollTop += pageSize; } else { document.body.scrollLeft += pageSize; }
                 return "scrolled";
             }
             return "limit";
         } else {
-            var currentScroll = vertical ? window.scrollY : window.scrollX;
+            var currentScroll = vertical ? document.body.scrollTop : document.body.scrollLeft;
             if (currentScroll > 0) {
-                if (vertical) { window.scrollBy(0, -pageSize); } else { window.scrollBy(-pageSize, 0); }
+                if (vertical) { document.body.scrollTop -= pageSize; } else { document.body.scrollLeft -= pageSize; }
                 return "scrolled";
             }
             return "limit";

@@ -283,11 +283,12 @@ struct ReaderWebView: UIViewRepresentable {
             
             let css = """
             \(fontFaceCss)
-            html, body { 
+            html, body {
+                overflow: hidden !important;
                 height: var(--page-height, 100vh) !important;
                 width: var(--page-width, 100vw) !important;
                 margin: 0 !important;
-                padding: 0 !important; 
+                padding: 0 !important;
             }
             body {
                 writing-mode: \(writingMode) !important;

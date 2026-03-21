@@ -114,7 +114,7 @@ struct ReaderView: View {
                         onInternalJump: viewModel.syncProgressAfterLinkJump,
                         onTextSelected: {
                             viewModel.closePopups()
-                            return viewModel.handleTextSelection($0, maxResults: userConfig.maxResults, scanLength: userConfig.scanLength, isVertical: userConfig.verticalWriting)
+                            return viewModel.handleTextSelection($0, maxResults: userConfig.maxResults, scanLength: userConfig.scanLength, isVertical: userConfig.verticalWriting, isFullWidth: userConfig.popupFullWidth)
                         },
                         onTapOutside: viewModel.closePopups,
                         onPageTurn: {
@@ -147,6 +147,7 @@ struct ReaderView: View {
                             dictionaryStyles: popup.dictionaryStyles,
                             screenSize: geometry.size,
                             isVertical: popup.isVertical,
+                            isFullWidth: popup.isFullWidth,
                             coverURL: viewModel.coverURL,
                             documentTitle: viewModel.document.title,
                             clearHighlight: popup.clearHighlight,
@@ -154,7 +155,7 @@ struct ReaderView: View {
                                 if let index = viewModel.popups.firstIndex(where: { $0.id == popupId }) {
                                     viewModel.closeChildPopups(parent: index)
                                 }
-                                return viewModel.handleTextSelection($0, maxResults: userConfig.maxResults, scanLength: userConfig.scanLength, isVertical: false)
+                                return viewModel.handleTextSelection($0, maxResults: userConfig.maxResults, scanLength: userConfig.scanLength, isVertical: false, isFullWidth: false)
                             },
                             onTapOutside: {
                                 if let index = viewModel.popups.firstIndex(where: { $0.id == popupId }) {

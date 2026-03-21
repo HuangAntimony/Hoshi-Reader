@@ -25,6 +25,7 @@ struct PopupItem: Identifiable {
     var lookupResults: [LookupResult] = []
     var dictionaryStyles: [String: String] = [:]
     var isVertical: Bool
+    var isFullWidth: Bool
     var clearHighlight: Bool
 }
 
@@ -244,7 +245,7 @@ class ReaderViewModel {
         return true
     }
     
-    func handleTextSelection(_ selection: SelectionData, maxResults: Int, scanLength: Int, isVertical: Bool) -> Int? {
+    func handleTextSelection(_ selection: SelectionData, maxResults: Int, scanLength: Int, isVertical: Bool, isFullWidth: Bool) -> Int? {
         let lookupResults = LookupEngine.shared.lookup(selection.text, maxResults: maxResults, scanLength: scanLength)
         var dictionaryStyles: [String: String] = [:]
         for style in LookupEngine.shared.getStyles() {
@@ -256,6 +257,7 @@ class ReaderViewModel {
             lookupResults: lookupResults,
             dictionaryStyles: dictionaryStyles,
             isVertical: isVertical,
+            isFullWidth: isFullWidth,
             clearHighlight: false
         )
         popups.append(popup)

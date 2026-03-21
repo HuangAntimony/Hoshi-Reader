@@ -34,7 +34,7 @@ struct DictionarySearchView: View {
                     },
                     onTextSelected: {
                         closePopups()
-                        return handleTextSelection($0, maxResults: userConfig.maxResults, scanLength: userConfig.scanLength, isVertical: false)
+                        return handleTextSelection($0, maxResults: userConfig.maxResults, scanLength: userConfig.scanLength, isVertical: false, isFullWidth: false)
                     },
                     onTapOutside: closePopups
                 )
@@ -49,6 +49,7 @@ struct DictionarySearchView: View {
                         dictionaryStyles: popup.dictionaryStyles,
                         screenSize: geometry.size,
                         isVertical: popup.isVertical,
+                        isFullWidth: popup.isFullWidth,
                         coverURL: nil,
                         documentTitle: nil,
                         clearHighlight: popup.clearHighlight,
@@ -56,7 +57,7 @@ struct DictionarySearchView: View {
                             if let index = popups.firstIndex(where: { $0.id == popupId }) {
                                 closeChildPopups(parent: index)
                             }
-                            return handleTextSelection($0, maxResults: userConfig.maxResults, scanLength: userConfig.scanLength, isVertical: false)
+                            return handleTextSelection($0, maxResults: userConfig.maxResults, scanLength: userConfig.scanLength, isVertical: false, isFullWidth: false)
                         },
                         onTapOutside: {
                             if let index = popups.firstIndex(where: { $0.id == popupId }) {
@@ -131,7 +132,7 @@ struct DictionarySearchView: View {
         content = constructHtml(results: results, styles: styles)
     }
     
-    private func handleTextSelection(_ selection: SelectionData, maxResults: Int, scanLength: Int,  isVertical: Bool) -> Int? {
+    private func handleTextSelection(_ selection: SelectionData, maxResults: Int, scanLength: Int,  isVertical: Bool, isFullWidth: Bool) -> Int? {
         let lookupResults = LookupEngine.shared.lookup(selection.text, maxResults: maxResults, scanLength: scanLength)
         var dictionaryStyles: [String: String] = [:]
         for style in LookupEngine.shared.getStyles() {
@@ -143,6 +144,7 @@ struct DictionarySearchView: View {
             lookupResults: lookupResults,
             dictionaryStyles: dictionaryStyles,
             isVertical: isVertical,
+            isFullWidth: isFullWidth,
             clearHighlight: false
         )
         popups.append(popup)

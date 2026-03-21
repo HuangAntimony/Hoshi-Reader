@@ -106,6 +106,7 @@ struct PopupView: View {
     let dictionaryStyles: [String: String]
     let screenSize: CGSize
     let isVertical: Bool
+    let isFullWidth: Bool
     let coverURL: URL?
     let documentTitle: String?
     var clearHighlight: Bool
@@ -124,7 +125,7 @@ struct PopupView: View {
             maxWidth: CGFloat(userConfig.popupWidth),
             maxHeight: CGFloat(userConfig.popupHeight),
             isVertical: isVertical,
-            isFullWidth: userConfig.popupFullWidth
+            isFullWidth: isFullWidth
         )
         
         guard result.width.isFinite,

@@ -299,8 +299,7 @@ struct ReaderWebView: UIViewRepresentable {
                 font-size: \(parent.userConfig.fontSize)px !important;
                 \(textSpacingCss)
                 box-sizing: border-box !important;
-                column-width: var(--page-height, 100vh) !important;
-                column-height: var(--page-width, 100vw) !important;
+                column-width: var(--page-width, 100vw) !important;
                 column-gap: \(columnGapValue)\(columnGapUnit);
                 padding: \(Double(parent.userConfig.verticalPadding) / 2)vh \(Double(parent.userConfig.horizontalPadding) / 2)vw !important;
             }

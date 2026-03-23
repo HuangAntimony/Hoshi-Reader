@@ -23,7 +23,7 @@ struct AboutView: View {
                 HStack {
                     Text("Version")
                     Spacer()
-                    Text("\(version) (\(build))")
+                    Text("\(version)")
                         .foregroundStyle(.secondary)
                 }
             }

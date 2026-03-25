@@ -32,7 +32,6 @@ final class ReaderWindow {
         
         let window = UIWindow(windowScene: scene)
         window.rootViewController = host
-        window.windowLevel = .normal + 1
         window.alpha = 0
         window.makeKeyAndVisible()
         self.window = window

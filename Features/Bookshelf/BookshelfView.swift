@@ -87,20 +87,6 @@ struct BookshelfView: View {
                         Button("Cancel", role: .cancel) { }
                     }
                 }
-                .onChange(of: pendingImportURL) { _, url in
-                    if let url {
-                        navigationPath = NavigationPath()
-                        viewModel.importBook(result: .success(url))
-                        pendingImportURL = nil
-                    }
-                }
-                .onChange(of: pendingRemoteImportURL) { _, url in
-                    if let url {
-                        navigationPath = NavigationPath()
-                        viewModel.importRemoteBook(from: url)
-                        pendingRemoteImportURL = nil
-                    }
-                }
                 .onChange(of: selectedTab) {
                     clearSelection()
                 }
@@ -183,6 +169,30 @@ struct BookshelfView: View {
                     autofocus: text.isEmpty
                 )
                 pendingLookup = nil
+            }
+        }
+        .onChange(of: pendingImportURL) { _, url in
+            if let url {
+                navigationPath = NavigationPath()
+                if url.pathExtension == "colpkg" {
+                    do {
+                        try AnkiManager.shared.importColpkg(from: url)
+                    } catch {
+                        viewModel.errorMessage = error.localizedDescription
+                        viewModel.shouldShowError = true
+                    }
+                } else {
+                    viewModel.importBook(result: .success(url))
+                }
+                viewModel.clearInbox()
+                pendingImportURL = nil
+            }
+        }
+        .onChange(of: pendingRemoteImportURL) { _, url in
+            if let url {
+                navigationPath = NavigationPath()
+                viewModel.importRemoteBook(from: url)
+                pendingRemoteImportURL = nil
             }
         }
         .alert("Error", isPresented: $viewModel.shouldShowError) {

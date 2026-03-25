@@ -323,6 +323,25 @@ class BookshelfViewModel {
         loadBookProgress()
     }
     
+    func clearInbox() {
+        guard let documentsDirectory = try? BookStorage.getDocumentsDirectory() else {
+            return
+        }
+        
+        let inboxDirectory = documentsDirectory.appendingPathComponent("Inbox")
+        guard FileManager.default.fileExists(atPath: inboxDirectory.path(percentEncoded: false)),
+              let inboxContents = try? FileManager.default.contentsOfDirectory(
+                at: inboxDirectory,
+                includingPropertiesForKeys: nil
+              ) else {
+            return
+        }
+        
+        for item in inboxContents {
+            try? FileManager.default.removeItem(at: item)
+        }
+    }
+    
     private func importProgress(ttuProgress: TtuProgress, to url: URL) {
         guard let bookInfo = BookStorage.loadBookInfo(root: url) else { return }
         
@@ -399,7 +418,6 @@ class BookshelfViewModel {
         try FileManager.default.copyItem(at: sourceURL, to: tempURL)
         
         defer {
-            clearInbox()
             try? FileManager.default.removeItem(at: tempURL)
             try? FileManager.default.removeItem(at: tempURL.deletingPathExtension())
         }
@@ -455,25 +473,6 @@ class BookshelfViewModel {
             try? BookStorage.delete(at: localURL)
             try? BookStorage.delete(at: bookFolder)
             throw error
-        }
-    }
-    
-    private func clearInbox() {
-        guard let documentsDirectory = try? BookStorage.getDocumentsDirectory() else {
-            return
-        }
-        
-        let inboxDirectory = documentsDirectory.appendingPathComponent("Inbox")
-        guard FileManager.default.fileExists(atPath: inboxDirectory.path(percentEncoded: false)),
-              let inboxContents = try? FileManager.default.contentsOfDirectory(
-                at: inboxDirectory,
-                includingPropertiesForKeys: nil
-              ) else {
-            return
-        }
-        
-        for item in inboxContents {
-            try? FileManager.default.removeItem(at: item)
         }
     }
     

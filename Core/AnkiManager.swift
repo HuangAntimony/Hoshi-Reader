@@ -254,10 +254,12 @@ class AnkiManager {
     }
     
     func importColpkg(from url: URL) throws {
-        guard url.startAccessingSecurityScopedResource() else {
-            throw ColpkgError.accessDenied
+        let accessing = url.startAccessingSecurityScopedResource()
+        defer {
+            if accessing {
+                url.stopAccessingSecurityScopedResource()
+            }
         }
-        defer { url.stopAccessingSecurityScopedResource() }
         
         let tempDir = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
@@ -348,12 +350,10 @@ class AnkiManager {
     
     enum ColpkgError: LocalizedError {
         case zstd
-        case accessDenied
         
         var errorDescription: String? {
             switch self {
             case .zstd: "Failed to decompress database"
-            case .accessDenied: "Failed to access .colpkg"
             }
         }
     }

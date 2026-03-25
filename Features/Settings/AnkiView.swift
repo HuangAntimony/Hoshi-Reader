@@ -13,7 +13,6 @@ struct AnkiView: View {
     @State private var ankiManager = AnkiManager.shared
     @State private var dictionaryManager = DictionaryManager.shared
     @State private var isImporting = false
-    @State private var isLoading = false
 
     private var availableHandlebars: [String] {
         var options = Handlebars.allCases.map(\.rawValue)
@@ -130,22 +129,11 @@ struct AnkiView: View {
             allowedContentTypes: [UTType(filenameExtension: "colpkg")!]
         ) { result in
             if case .success(let url) = result {
-                isLoading = true
-                Task.detached {
-                    do {
-                        try await AnkiManager.shared.importColpkg(from: url)
-                    } catch {
-                        await MainActor.run {
-                            ankiManager.errorMessage = error.localizedDescription
-                        }
-                    }
-                    await MainActor.run { isLoading = false }
+                do {
+                    try ankiManager.importColpkg(from: url)
+                } catch {
+                    ankiManager.errorMessage = error.localizedDescription
                 }
-            }
-        }
-        .overlay {
-            if isLoading {
-                LoadingOverlay("Importing…")
             }
         }
         .navigationTitle("Anki")

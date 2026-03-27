@@ -27,11 +27,9 @@ struct AnkiConnectView: View {
                     VStack(alignment: .leading, spacing: 3) {
                         TextField("Address", text: Binding(
                             get: { ankiManager.ankiConnectConfig?.url ?? "" },
-                            set: { value in
-                                ankiManager.ankiConnectConfig?.url = value
-                                ankiManager.save()
-                            }
+                            set: { ankiManager.ankiConnectConfig?.url = $0 }
                         ))
+                        .onSubmit { ankiManager.save() }
                     }
                     Button("Connect") { Task { await ankiManager.pingAnkiConnect() } }
                 }

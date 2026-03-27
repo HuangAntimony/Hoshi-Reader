@@ -46,7 +46,7 @@ class AnkiManager {
     }
     
     var useAnkiConnect: Bool = false
-    var ankiConnectConfig: AnkiConnectConfig?
+    var ankiConnectConfig: AnkiConnectConfig? = AnkiConnectConfig(url: nil, timeout: 10, duplicateScope: .collection, forceSync: false)
     var isAnkiConnectReachable = false
     
     private static let scheme = "hoshi://"

@@ -85,6 +85,7 @@ window.hoshiReader = {
             return;
         }
         
+        var vertical = this.isVertical();
         var walker = this.createWalker();
         var totalChars = 0;
         var node;
@@ -114,7 +115,10 @@ window.hoshiReader = {
         if (targetNode) {
             var el = targetNode.parentElement;
             if (el) {
-                el.scrollIntoView({ block: progress >= 0.99 ? 'end' : 'start', behavior: 'instant' });
+                el.scrollIntoView({
+                    block: progress >= 0.999999 ? 'end' : 'start',
+                    behavior: 'instant'
+                });
             }
         }
         

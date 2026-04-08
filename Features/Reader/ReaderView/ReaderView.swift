@@ -41,7 +41,6 @@ struct ReaderLoader: View {
 struct ReaderView: View {
     @Environment(\.dismissReader) private var dismissReader
     @Environment(\.colorScheme) private var systemColorScheme
-    @Environment(\.scenePhase) private var scenePhase
     @Environment(UserConfig.self) private var userConfig
     @State private var viewModel: ReaderViewModel
     @State private var topSafeArea: CGFloat = UIApplication.topSafeArea
@@ -342,17 +341,18 @@ struct ReaderView: View {
         .onChange(of: readerTextColor) { _, hex in
             viewModel.bridge.send(.updateTextColor(hex))
         }
-        .onChange(of: scenePhase) { _, phase in
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             guard viewModel.isTracking else {
                 return
             }
-            if phase == .active {
-                viewModel.lastTimestamp = .now
-                viewModel.isPaused = false
+            viewModel.lastTimestamp = .now
+            viewModel.isPaused = false
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+            guard viewModel.isTracking else {
+                return
             }
-            else {
-                viewModel.isPaused = true
-            }
+            viewModel.isPaused = true
         }
         .ignoresSafeArea(edges: .top)
         .ignoresSafeArea(.keyboard)

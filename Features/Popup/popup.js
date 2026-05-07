@@ -1508,9 +1508,12 @@ window.renderPopup = function() {
             const dictNames = Object.keys(grouped);
             for (let dictIdx = 0; dictIdx < dictNames.length; dictIdx++) {
                 entryDiv.appendChild(createGlossarySection(dictNames[dictIdx], grouped[dictNames[dictIdx]], dictIdx === 0, idx));
+                if (idx === 0) {
+                    await new Promise(r => requestAnimationFrame(r));
+                }
             }
             
-            if (idx === 0 || (idx + 1) % 4 === 0) {
+            if (idx > 0) {
                 await new Promise(r => requestAnimationFrame(r));
             }
         }

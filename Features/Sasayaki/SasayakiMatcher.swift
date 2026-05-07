@@ -78,6 +78,11 @@ struct SasayakiMatcher {
             }
             
             let chars = Array(text)
+            if cue.text.hasPrefix("＊") && chars.count < 5 {
+                unmatched += 1
+                continue
+            }
+            
             guard let index = findText(source: source, text: chars, start: cursor, end: min(source.count, cursor + chars.count + searchWindow)) else {
                 unmatched += 1
                 continue

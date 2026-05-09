@@ -237,6 +237,10 @@ class UserConfig {
         didSet { UserDefaults.standard.set(popupActionBar, forKey: "popupActionBar") }
     }
     
+    var popupDisableTransparency: Bool {
+        didSet { UserDefaults.standard.set(popupDisableTransparency, forKey: "popupDisableTransparency") }
+    }
+    
     var popupFullWidth: Bool {
         didSet { UserDefaults.standard.set(popupFullWidth, forKey: "popupFullWidth") }
     }
@@ -408,6 +412,7 @@ class UserConfig {
         self.popupWidth = defaults.object(forKey: "popupWidth") as? Int ?? 320
         self.popupHeight = defaults.object(forKey: "popupHeight") as? Int ?? 250
         self.popupActionBar = defaults.object(forKey: "popupActionBar") as? Bool ?? false
+        self.popupDisableTransparency = defaults.object(forKey: "popupDisableTransparency") as? Bool ?? false
         self.popupFullWidth = defaults.object(forKey: "popupFullWidth") as? Bool ?? false
         self.popupSwipeToDismiss = defaults.object(forKey: "popupSwipeToDismiss") as? Bool ?? false
         self.popupSwipeThreshold = defaults.object(forKey: "popupSwipeThreshold") as? Int ?? 40

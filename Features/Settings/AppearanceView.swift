@@ -282,6 +282,8 @@ struct AppearanceView: View {
                     
                     Toggle("Show Action Bar", isOn: Bindable(userConfig).popupActionBar)
                     
+                    Toggle("Disable Transparency", isOn: Bindable(userConfig).popupDisableTransparency)
+                    
                     Toggle("Full-width", isOn: Bindable(userConfig).popupFullWidth)
                     
                     Toggle("Swipe to Dismiss", isOn: Bindable(userConfig).popupSwipeToDismiss)

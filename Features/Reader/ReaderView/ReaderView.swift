@@ -417,8 +417,9 @@ struct ReaderView: View {
                                     }
                                 } label: {
                                     Image(systemName: viewModel.isTracking ? "timer" : "chart.xyaxis.line")
-                                        .font(.subheadline)
-                                        .frame(width: 24, height: lineHeight)
+                                        .font(.system(size: 16))
+                                        .frame(width: 26, height: 20)
+                                        .contentShape(Rectangle())
                                 }
                                 .buttonStyle(.plain)
                                 .foregroundStyle(userConfig.theme == .custom ? AnyShapeStyle(userConfig.customInfoColor) : AnyShapeStyle(.secondary))
@@ -468,8 +469,9 @@ struct ReaderView: View {
                                     }
                                 } label: {
                                     Image(systemName: viewModel.sasayakiPlayer.isPlaying || viewModel.wasPaused ? "pause.fill" : "waveform")
-                                        .font(.subheadline)
-                                        .frame(width: 24, height: lineHeight)
+                                        .font(.system(size: 16))
+                                        .frame(width: 26, height: 20)
+                                        .contentShape(Rectangle())
                                 }
                                 .buttonStyle(.plain)
                                 .foregroundStyle(userConfig.theme == .custom ? AnyShapeStyle(userConfig.customInfoColor) : AnyShapeStyle(.secondary))

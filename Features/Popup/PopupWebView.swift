@@ -148,6 +148,7 @@ class DocumentResourceHandler: NSObject, WKURLSchemeHandler {
 struct PopupWebView: UIViewRepresentable {
     let content: String
     let position: CGPoint
+    var scale: CGFloat = 1.0
     var clearSelection: Bool
     var dictionaryStyles: [String: String] = [:]
     var lookupEntries: [[String: Any]] = []
@@ -217,8 +218,14 @@ struct PopupWebView: UIViewRepresentable {
         if !context.coordinator.wasLoaded {
             context.coordinator.currentContent = content
             context.coordinator.wasLoaded = true
+            context.coordinator.scale = scale
             let html = constructHtml(content: content)
             webView.loadHTMLString(html, baseURL: Bundle.main.resourceURL)
+        }
+        
+        if context.coordinator.scale != scale {
+            context.coordinator.scale = scale
+            webView.evaluateJavaScript("document.documentElement.style.zoom = '\(scale)'")
         }
         
         if context.coordinator.clearSelection != clearSelection {
@@ -259,6 +266,7 @@ struct PopupWebView: UIViewRepresentable {
         var clearSelection: Bool = false
         var lastBackTrigger: Bool = false
         var lastForwardTrigger: Bool = false
+        var scale: CGFloat = 1.0
         var entries: [[String: Any]] = []
         let id = UUID()
         
@@ -357,7 +365,10 @@ struct PopupWebView: UIViewRepresentable {
         <head>
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
             <link rel="stylesheet" href="popup.css">
-            <style>\(FontManager.shared.fontfaceCSS)</style>
+            <style>
+                \(FontManager.shared.fontfaceCSS)
+                html { zoom: \(scale); }
+            </style>
             <script>window.scanNonJapaneseText = \(scanNonJapaneseText);</script>
             <script src="selection.js"></script>
             <script src="popup.js"></script>

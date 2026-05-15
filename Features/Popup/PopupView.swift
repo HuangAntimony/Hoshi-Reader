@@ -305,6 +305,7 @@ struct PopupView: View {
             PopupWebView(
                 content: content,
                 position: CGPoint(x: layout.position.x - layout.width / 2, y: layout.position.y - layout.height / 2 + controlsHeight),
+                scale: CGFloat(userConfig.popupScale),
                 clearSelection: clearSelection,
                 dictionaryStyles: dictionaryStyles,
                 lookupEntries: lookupEntries,

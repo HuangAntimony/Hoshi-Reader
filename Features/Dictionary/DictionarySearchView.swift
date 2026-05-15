@@ -48,6 +48,7 @@ struct DictionarySearchView: View {
                 PopupWebView(
                     content: content,
                     position: .zero,
+                    scale: CGFloat(userConfig.popupScale),
                     clearSelection: clearSelection,
                     dictionaryStyles: dictionaryStyles,
                     lookupEntries: lookupEntries,

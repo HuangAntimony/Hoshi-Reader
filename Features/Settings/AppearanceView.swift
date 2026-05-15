@@ -278,6 +278,14 @@ struct AppearanceView: View {
                             get: { Double(userConfig.popupHeight) },
                             set: { userConfig.popupHeight = Int($0) }
                         ), in: 100...500, step: 10)
+                        
+                        HStack {
+                            Text("Scale")
+                            Spacer()
+                            Text("\(userConfig.popupScale, specifier: "%.2f")")
+                                .fontWeight(.semibold)
+                        }
+                        Slider(value: Bindable(userConfig).popupScale, in: 0.8...1.5, step: 0.05)
                     }
                     
                     Toggle("Show Action Bar", isOn: Bindable(userConfig).popupActionBar)

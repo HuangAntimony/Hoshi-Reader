@@ -233,6 +233,10 @@ class UserConfig {
         didSet { UserDefaults.standard.set(popupHeight, forKey: "popupHeight") }
     }
     
+    var popupScale: Double {
+        didSet { UserDefaults.standard.set(popupScale, forKey: "popupScale") }
+    }
+    
     var popupActionBar: Bool {
         didSet { UserDefaults.standard.set(popupActionBar, forKey: "popupActionBar") }
     }
@@ -411,6 +415,7 @@ class UserConfig {
         
         self.popupWidth = defaults.object(forKey: "popupWidth") as? Int ?? 320
         self.popupHeight = defaults.object(forKey: "popupHeight") as? Int ?? 250
+        self.popupScale = defaults.object(forKey: "popupScale") as? Double ?? 1.0
         self.popupActionBar = defaults.object(forKey: "popupActionBar") as? Bool ?? false
         self.popupDisableTransparency = defaults.object(forKey: "popupDisableTransparency") as? Bool ?? false
         self.popupFullWidth = defaults.object(forKey: "popupFullWidth") as? Bool ?? false

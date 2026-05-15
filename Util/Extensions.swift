@@ -135,3 +135,14 @@ extension UIColor {
         }
     }
 }
+
+extension View {
+    @ViewBuilder
+    func conditionalGlassEffect() -> some View {
+        if #available(iOS 26, *) {
+            self.glassEffect(.regular.interactive())
+        } else {
+            self
+        }
+    }
+}

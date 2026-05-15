@@ -430,33 +430,3 @@ struct DictionarySearchBar: View {
         }
     }
 }
-
-struct CircleButton: View {
-    @Environment(\.colorScheme) private var colorScheme
-    let systemName: String
-    let interactive: Bool
-    let fontSize: CGFloat
-    
-    init(systemName: String, interactive: Bool = true, fontSize: CGFloat = 20) {
-        self.systemName = systemName
-        self.interactive = interactive
-        self.fontSize = fontSize
-    }
-    
-    var body: some View {
-        if #available(iOS 26, *) {
-            Image(systemName: systemName)
-                .font(.system(size: fontSize))
-                .foregroundStyle(.primary)
-                .frame(width: 44, height: 44)
-                .glassEffect(interactive ? .regular.interactive() : .regular)
-                .padding(8)
-                .contentShape(Circle())
-        } else {
-            Image(systemName: systemName)
-                .font(.system(size: fontSize))
-                .foregroundStyle(.primary)
-                .padding(8)
-        }
-    }
-}

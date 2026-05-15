@@ -32,50 +32,27 @@ struct CSSEditorView: View {
         }
     }
     
-    @ViewBuilder
     private var toolbar: some View {
-        if #available(iOS 26, *) {
-            HStack {
-                fontMenu
-                    .glassEffect(.regular.interactive())
-                dictionaryMenu
-                    .glassEffect(.regular.interactive())
-                Spacer()
-                if isFocused {
-                    Button {
-                        isFocused = false
-                    } label: {
-                        Image(systemName: "keyboard.chevron.compact.down")
-                            .font(.system(size: 20))
-                            .foregroundStyle(.primary)
-                            .frame(width: 44, height: 44)
-                            .glassEffect(.regular.interactive())
-                    }
-                    .buttonStyle(.plain)
+        HStack {
+            fontMenu
+                .conditionalGlassEffect()
+            dictionaryMenu
+                .conditionalGlassEffect()
+            Spacer()
+            if isFocused {
+                Button {
+                    isFocused = false
+                } label: {
+                    Image(systemName: "keyboard.chevron.compact.down")
+                        .font(.system(size: 20))
+                        .foregroundStyle(.primary)
+                        .frame(width: 44, height: 44)
                 }
+                .buttonStyle(.plain)
+                .conditionalGlassEffect()
             }
-            .padding(8)
-        } else {
-            HStack {
-                fontMenu
-                    .background(.ultraThinMaterial, in: Capsule())
-                dictionaryMenu
-                    .background(.ultraThinMaterial, in: Capsule())
-                Spacer()
-                if isFocused {
-                    Button {
-                        isFocused = false
-                    } label: {
-                        Image(systemName: "keyboard.chevron.compact.down")
-                            .font(.system(size: 20))
-                            .foregroundStyle(.primary)
-                            .frame(width: 44, height: 44)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding(8)
         }
+        .padding(8)
     }
     
     private var dictionaryMenu: some View {

@@ -61,7 +61,6 @@ struct ReaderView: View {
     @State private var topBarRightWidth: CGFloat = 0
     @State private var topBarTotalWidth: CGFloat = 0
     @State private var titleNaturalWidth: CGFloat = 0
-    
     private let webViewPadding: CGFloat = 4
     private let lineHeight: CGFloat = 16
     
@@ -342,14 +341,20 @@ struct ReaderView: View {
             }
             
             HStack {
-                CircleButton(systemName: "chevron.left")
-                    .onTapGesture {
-                        if viewModel.isTracking {
-                            viewModel.stopTracking()
-                        }
-                        dismissReader?()
+                Button {
+                    if viewModel.isTracking {
+                        viewModel.stopTracking()
                     }
-                    .opacity(focusMode ? 0 : 1)
+                    dismissReader?()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 20))
+                        .foregroundStyle(.primary)
+                        .frame(width: 44, height: 44)
+                }
+                .buttonStyle(.plain)
+                .conditionalGlassEffect()
+                .opacity(focusMode ? 0 : 1)
                 
                 Spacer()
                 
@@ -388,9 +393,14 @@ struct ReaderView: View {
                         }
                     }
                 } label: {
-                    CircleButton(systemName: "slider.horizontal.3")
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.system(size: 20))
+                        .foregroundStyle(.primary)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Circle())
                 }
-                .tint(.primary)
+                .buttonStyle(.plain)
+                .conditionalGlassEffect()
                 .opacity(focusMode ? 0 : 1)
             }
             .padding(.horizontal, 20)

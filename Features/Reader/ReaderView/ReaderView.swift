@@ -412,7 +412,7 @@ struct ReaderView: View {
                 }
             }
         }
-        .background(readerBackgroundColor)
+        .background(readerBackgroundColor.ignoresSafeArea())
         .overlay(alignment: .top) {
             VStack(spacing: 1) {
                 ZStack(alignment: .leading) {

@@ -36,6 +36,14 @@ struct SasayakiSettingsView: View {
                     Toggle("Auto-Pause on Lookup", isOn: $userConfig.sasayakiAutoPause)
                 }
                 
+                Section {
+                    Toggle("Show Seek Controls", isOn: $userConfig.sasayakiSeekControls)
+                } header: {
+                    Text("Command Center")
+                } footer: {
+                    Text("Seek Controls will replace Next/Previous Cue controls")
+                }
+                
                 Section("Light Theme") {
                     ColorPicker("Text Color", selection: $userConfig.sasayakiTextColor)
                     ColorPicker("Background Color", selection: $userConfig.sasayakiBackgroundColor)

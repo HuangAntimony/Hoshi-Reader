@@ -333,8 +333,8 @@ class UserConfig {
         didSet { UserDefaults.standard.set(sasayakiAutoPause, forKey: "sasayakiAutoPause") }
     }
     
-    var sasayakiSeekControls: Bool {
-        didSet { UserDefaults.standard.set(sasayakiSeekControls, forKey: "sasayakiSeekControls") }
+    var sasayakiSkipControls: Bool {
+        didSet { UserDefaults.standard.set(sasayakiSkipControls, forKey: "sasayakiSkipControls") }
     }
     
     var sasayakiEnableSync: Bool {
@@ -448,7 +448,7 @@ class UserConfig {
         self.enableSasayaki = defaults.object(forKey: "enableSasayaki") as? Bool ?? false
         self.sasayakiAutoScroll = defaults.object(forKey: "sasayakiAutoScroll") as? Bool ?? true
         self.sasayakiAutoPause = defaults.object(forKey: "sasayakiAutoPause") as? Bool ?? true
-        self.sasayakiSeekControls = defaults.object(forKey: "sasayakiSeekControls") as? Bool ?? false
+        self.sasayakiSkipControls = defaults.object(forKey: "sasayakiSkipControls") as? Bool ?? false
         self.sasayakiEnableSync = defaults.object(forKey: "sasayakiEnableSync") as? Bool ?? false
         self.sasayakiTextColor = UserConfig.loadColor(key: "sasayakiTextColor") ?? Color(.sRGB, red: 0, green: 0, blue: 0)
         self.sasayakiBackgroundColor = UserConfig.loadColor(key: "sasayakiBackgroundColor") ?? Color(.sRGB, red: 0.53, green: 0.81, blue: 0.98, opacity: 0.4)

@@ -547,7 +547,7 @@ class SasayakiPlayer {
             Task { @MainActor in self?.togglePlayback() }
             return .success
         }
-        if UserDefaults.standard.bool(forKey: "sasayakiSeekControls") {
+        if UserDefaults.standard.bool(forKey: "sasayakiSkipControls") {
             center.skipBackwardCommand.preferredIntervals = [NSNumber(value: skipInterval)]
             center.skipBackwardCommand.addTarget { [weak self] _ in
                 Task { @MainActor in self?.skip(forward: false) }

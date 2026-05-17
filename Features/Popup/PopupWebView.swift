@@ -195,7 +195,7 @@ struct PopupWebView: UIViewRepresentable {
         config.userContentController.add(context.coordinator, name: "tapOutside")
         config.userContentController.add(context.coordinator, name: "swipeDismiss")
         config.userContentController.add(context.coordinator, name: "playWordAudio")
-        config.userContentController.add(context.coordinator, name: "buttonFrames")
+        config.userContentController.add(context.coordinator, name: "buttonRects")
         config.userContentController.addScriptMessageHandler(context.coordinator, contentWorld: .page, name: "mineEntry")
         config.userContentController.addScriptMessageHandler(context.coordinator, contentWorld: .page, name: "duplicateCheck")
         config.userContentController.addScriptMessageHandler(context.coordinator, contentWorld: .page, name: "getEntries")
@@ -229,7 +229,7 @@ struct PopupWebView: UIViewRepresentable {
         
         if context.coordinator.scale != scale {
             context.coordinator.scale = scale
-            webView.evaluateJavaScript("document.documentElement.style.zoom = '\(scale)'; if (typeof syncButtonFrames === 'function') requestAnimationFrame(syncButtonFrames)")
+            webView.evaluateJavaScript("document.documentElement.style.zoom = '\(scale)'; if (typeof reportButtonRects === 'function') requestAnimationFrame(reportButtonRects)")
         }
         
         if context.coordinator.clearSelection != clearSelection {
@@ -257,7 +257,7 @@ struct PopupWebView: UIViewRepresentable {
         webView.configuration.userContentController.removeScriptMessageHandler(forName: "tapOutside")
         webView.configuration.userContentController.removeScriptMessageHandler(forName: "swipeDismiss")
         webView.configuration.userContentController.removeScriptMessageHandler(forName: "playWordAudio")
-        webView.configuration.userContentController.removeScriptMessageHandler(forName: "buttonFrames")
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: "buttonRects")
         webView.configuration.userContentController.removeScriptMessageHandler(forName: "mineEntry", contentWorld: .page)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: "duplicateCheck", contentWorld: .page)
         webView.configuration.userContentController.removeScriptMessageHandler(forName: "getEntries", contentWorld: .page)
@@ -281,17 +281,17 @@ struct PopupWebView: UIViewRepresentable {
             self.parent = parent
         }
         
-        private func updateButtons(_ frames: [[String: Any]], in webView: WKWebView) {
+        private func updateButtons(_ rects: [[String: Any]], in webView: WKWebView) {
             var activeKeys = Set<String>()
             let symbolConfig = UIImage.SymbolConfiguration(pointSize: 13 * scale, weight: .medium)
             
-            for frame in frames {
-                guard let kind = frame["kind"] as? String,
-                      let entryIndex = frame["entryIndex"] as? Int,
-                      let x = frame["x"] as? CGFloat,
-                      let y = frame["y"] as? CGFloat,
-                      let width = frame["width"] as? CGFloat,
-                      let height = frame["height"] as? CGFloat,
+            for rect in rects {
+                guard let kind = rect["kind"] as? String,
+                      let entryIndex = rect["entryIndex"] as? Int,
+                      let x = rect["x"] as? CGFloat,
+                      let y = rect["y"] as? CGFloat,
+                      let width = rect["width"] as? CGFloat,
+                      let height = rect["height"] as? CGFloat,
                       width > 0, height > 0 else {
                     continue
                 }
@@ -312,9 +312,9 @@ struct PopupWebView: UIViewRepresentable {
                 
                 button.tag = entryIndex * 2 + (kind == "audio" ? 0 : 1)
                 button.frame = CGRect(x: x, y: y, width: width, height: height)
-                let state = frame["state"] as? String ?? "default"
+                let state = rect["state"] as? String ?? "default"
                 button.setImage(UIImage(systemName: symbolName(kind: kind, state: state), withConfiguration: symbolConfig), for: .normal)
-                button.isEnabled = frame["enabled"] as? Bool ?? true
+                button.isEnabled = rect["enabled"] as? Bool ?? true
                 button.alpha = button.isEnabled ? 0.85 : 0.55
             }
             
@@ -389,10 +389,10 @@ struct PopupWebView: UIViewRepresentable {
             else if message.name == "swipeDismiss" {
                 parent.onSwipeDismiss?()
             }
-            else if message.name == "buttonFrames",
-                    let frames = message.body as? [[String: Any]] {
+            else if message.name == "buttonRects",
+                    let rects = message.body as? [[String: Any]] {
                 guard let webView = message.webView else { return }
-                updateButtons(frames, in: webView)
+                updateButtons(rects, in: webView)
             }
             else if message.name == "textSelected" {
                 guard let body = message.body as? [String: Any],

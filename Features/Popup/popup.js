@@ -1210,21 +1210,35 @@ function playWordAudio(audioUrl) {
     }
 }
 
-function syncButtonFrames() {
-    const frames = [...document.querySelectorAll('.button-slot')].map(slot => {
+function getButtonRectScale() {
+    const zoom = Number.parseFloat(getComputedStyle(document.documentElement).zoom);
+    if (zoom === 1) {
+        return 1;
+    }
+    
+    const probe = el('div', { style: 'position:absolute;width:100px;visibility:hidden;' });
+    document.body.appendChild(probe);
+    const width = probe.getBoundingClientRect().width;
+    probe.remove();
+    return 100 * zoom / width;
+}
+
+function reportButtonRects() {
+    const scale = getButtonRectScale();
+    const rects = [...document.querySelectorAll('.button-slot')].map(slot => {
         const rect = slot.getBoundingClientRect();
         return {
             kind: slot.dataset.kind,
             entryIndex: Number(slot.dataset.entryIndex),
-            x: rect.left + window.scrollX,
-            y: rect.top + window.scrollY,
-            width: rect.width,
-            height: rect.height,
+            x: (rect.left + window.scrollX) * scale,
+            y: (rect.top + window.scrollY) * scale,
+            width: rect.width * scale,
+            height: rect.height * scale,
             state: slot.dataset.state || 'default',
             enabled: slot.dataset.enabled !== 'false'
         };
     });
-    webkit.messageHandlers.buttonFrames.postMessage(frames);
+    webkit.messageHandlers.buttonRects.postMessage(rects);
 }
 
 window.addEventListener('resize', () => requestAnimationFrame(syncButtonFrames));
@@ -1247,7 +1261,7 @@ function updateButtonSlot(slot, changes) {
     if (!slot || !slot.isConnected) { return; }
     if ('state' in changes) { slot.dataset.state = changes.state; }
     if ('enabled' in changes) { slot.dataset.enabled = String(changes.enabled); }
-    requestAnimationFrame(syncButtonFrames);
+    requestAnimationFrame(reportButtonRects);
 }
 
 async function playEntryAudio(entryIndex) {
@@ -1324,7 +1338,7 @@ function createEntryHeader(entry, idx) {
     });
     
     header.appendChild(buttonsContainer);
-    requestAnimationFrame(syncButtonFrames);
+    requestAnimationFrame(reportButtonRects);
     
     return header;
 }
@@ -1436,7 +1450,7 @@ function redirect(count) {
     audioUrls = {};
     selectedDictionaries = {};
     document.getElementById('entries-container').innerHTML = '';
-    syncButtonFrames();
+    reportButtonRects();
     window.renderPopup();
     requestAnimationFrame(() => {
         document.scrollingElement.scrollTop = 0;
@@ -1463,7 +1477,7 @@ function restore(s) {
     window.entryCount = s.entryCount;
     audioUrls = {};
     selectedDictionaries = {};
-    requestAnimationFrame(syncButtonFrames);
+    requestAnimationFrame(reportButtonRects);
     requestAnimationFrame(() => {
         document.scrollingElement.scrollTop = s.scrollTop;
     });

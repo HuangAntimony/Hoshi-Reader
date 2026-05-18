@@ -10,6 +10,8 @@ import SwiftUI
 import CHoshiDicts
 
 struct DictionarySearchView: View {
+    private static let resetTextFieldScrollThreshold: CGFloat = 80
+    
     @Environment(UserConfig.self) private var userConfig
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var query: String = ""
@@ -26,6 +28,11 @@ struct DictionarySearchView: View {
     @State private var forwardCount: Int = 0
     @State private var backTrigger: Bool = false
     @State private var forwardTrigger: Bool = false
+    @State private var isDragging: Bool = false
+    @State private var isRefreshing: Bool = false
+    @State private var isResettingTextField: Bool = false
+    @State private var scrollViewInitialContentOffset: CGFloat! = nil
+    @State private var scrollViewContentOffset: CGFloat! = nil
     var initialQuery: String = ""
     var initialAutofocus: Bool = true
     var shouldFocus: Bool = false
@@ -72,6 +79,29 @@ struct DictionarySearchView: View {
                             forwardCount = 0
                         }
                         return entries
+                    },
+                    scrollViewBounces: true,
+                    onScrollViewOffsetChanged: { newOffset in
+                        if scrollViewInitialContentOffset == nil {
+                            scrollViewInitialContentOffset = newOffset
+                        }
+                        scrollViewContentOffset = newOffset
+                    },
+                    onScrollViewWillBeginDragging: {
+                        isDragging = true
+                    },
+                    onScrollViewDidEndDragging: {
+                        isDragging = false
+                        if scrollViewInitialContentOffset - scrollViewContentOffset > Self.resetTextFieldScrollThreshold {
+                            isRefreshing = true
+                            if !query.isEmpty {
+                                isResettingTextField = true
+                            }
+                        }
+                    },
+                    onScrollViewDidEndDecelerating: {
+                        isRefreshing = false
+                        isResettingTextField = false
                     }
                 )
                 .id(lastQuery)
@@ -149,13 +179,32 @@ struct DictionarySearchView: View {
                 .ignoresSafeArea(edges: .top)
         }
         .safeAreaInset(edge: .top) {
-            DictionarySearchBar(text: $query, isFocused: $searchFocused) {
-                runLookup()
+            VStack {
+                DictionarySearchBar(text: $query, isFocused: $searchFocused) {
+                    runLookup()
+                }
+                
+                if let scrollViewInitialContentOffset {
+                    SearchResetInset(
+                        scrollDistance: scrollViewInitialContentOffset - scrollViewContentOffset,
+                        threshold: Self.resetTextFieldScrollThreshold,
+                        isQueryEmpty: query.isEmpty,
+                        isRefreshing: isRefreshing,
+                        isDragging: isDragging,
+                        isResettingTextField: isResettingTextField
+                    )
+                }
             }
         }
         .onChange(of: shouldFocus) {
             searchFocused = true
         }
+        .onChange(of: isRefreshing, { _, isRefreshing in
+            if isRefreshing {
+                query = ""
+                searchFocused = true
+            }
+        })
         .onAppear {
             if !didInitialQuery && !initialQuery.isEmpty {
                 query = initialQuery
@@ -374,7 +423,12 @@ struct DictionarySearchView: View {
     }
 }
 
-struct DictionarySearchBar: View {
+struct DictionarySearchBar: Equatable, View {
+    
+    static func == (lhs: DictionarySearchBar, rhs: DictionarySearchBar) -> Bool {
+        lhs.text == rhs.text && lhs.isFocused == rhs.isFocused
+    }
+    
     @Binding var text: String
     @Binding var isFocused: Bool
     let onSubmit: () -> Void
@@ -435,5 +489,61 @@ struct DictionarySearchBar: View {
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 20)
         }
+    }
+}
+
+fileprivate struct SearchResetInset: View {
+    private let scrollDistance: CGFloat
+    private let threshold: CGFloat
+    private let isQueryEmpty: Bool
+    private let isRefreshing: Bool
+    private let isDragging: Bool
+    private let isResettingTextField: Bool
+    
+    private var pullTitle: String {
+        isQueryEmpty ? "Pull down to show keyboard" : "Pull down to clear"
+    }
+
+    private var releaseTitle: String {
+        isQueryEmpty && !isResettingTextField ? "Release to show keyboard" : "Release to clear"
+    }
+    
+    private var height: CGFloat {
+        max(0, min(scrollDistance, threshold))
+    }
+    
+    private var hasReachedThreshold: Bool {
+        scrollDistance > threshold
+    }
+    
+    private var rotateCondition: Bool {
+        (hasReachedThreshold && isDragging) || isRefreshing
+    }
+    
+    var body: some View {
+        HStack {
+            Image(systemName: "arrow.down")
+                .font(.system(size: 30, weight: .regular))
+                .rotationEffect(.degrees(rotateCondition ? 180 : 0))
+            
+            Text(rotateCondition ? releaseTitle : pullTitle)
+                .font(.system(size: 15))
+                .contentTransition(.identity)
+        }
+        .frame(height: threshold)
+        .frame(maxWidth: .infinity)
+        .frame(height: height, alignment: .bottom)
+        .clipped()
+        .allowsHitTesting(false)
+        .animation(.easeInOut(duration: 0.15), value: hasReachedThreshold)
+    }
+    
+    init(scrollDistance: CGFloat, threshold: CGFloat, isQueryEmpty: Bool, isRefreshing: Bool, isDragging: Bool, isResettingTextField: Bool) {
+        self.scrollDistance = scrollDistance
+        self.threshold = threshold
+        self.isQueryEmpty = isQueryEmpty
+        self.isRefreshing = isRefreshing
+        self.isDragging = isDragging
+        self.isResettingTextField = isResettingTextField
     }
 }

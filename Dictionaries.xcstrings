@@ -1,0 +1,213 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Address" : {
+
+    },
+    "Allow Duplicates" : {
+
+    },
+    "Anki" : {
+
+    },
+    "AnkiConnect" : {
+
+    },
+    "AnkiConnect Status: %@" : {
+
+    },
+    "AnkiMobile or an AnkiConnect instance is required to mine words." : {
+
+    },
+    "Behaviour" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Check All Models" : {
+
+    },
+    "Collapse All" : {
+
+    },
+    "Collapse Dictionaries" : {
+
+    },
+    "Collection" : {
+
+    },
+    "Compact Glossaries" : {
+
+    },
+    "Compact Pitch Accents" : {
+
+    },
+    "Config" : {
+
+    },
+    "Configure" : {
+
+    },
+    "Connect" : {
+
+    },
+    "Connected" : {
+
+    },
+    "Connection" : {
+
+    },
+    "Custom" : {
+
+    },
+    "Custom CSS" : {
+
+    },
+    "Deck" : {
+
+    },
+    "Deck Root" : {
+
+    },
+    "Deduplicate Pitch Accents" : {
+
+    },
+    "Default to Dictionary Tab" : {
+
+    },
+    "Dictionaries" : {
+
+    },
+    "Download" : {
+
+    },
+    "Download Dictionaries" : {
+
+    },
+    "Download Recommended Dictionaries" : {
+
+    },
+    "Duplicate Scope" : {
+
+    },
+    "Embed Dictionary Media" : {
+
+    },
+    "Embedding media will increase size of glossaries (AnkiMobile)." : {
+
+    },
+    "Error" : {
+
+    },
+    "Expand All" : {
+
+    },
+    "Expand First Dictionary" : {
+
+    },
+    "Fetch decks and models from Anki" : {
+
+    },
+    "Fetch from Anki?" : {
+
+    },
+    "Fields" : {
+
+    },
+    "Force Sync on adding card" : {
+
+    },
+    "Frequency" : {
+
+    },
+    "Harmonic Frequency" : {
+
+    },
+    "Import Anki Backup (Stored Words: %@)" : {
+
+    },
+    "Importing a .colpkg/.apkg backup from Anki will allow Hoshi Reader to check for duplicates immediately. It's recommended to do this periodically to reduce drift." : {
+
+    },
+    "Lookup" : {
+
+    },
+    "Max Results" : {
+
+    },
+    "Mode" : {
+
+    },
+    "Model" : {
+
+    },
+    "None" : {
+
+    },
+    "Not connected" : {
+
+    },
+    "Not Connected" : {
+
+    },
+    "OK" : {
+
+    },
+    "Pitch" : {
+
+    },
+    "Reset" : {
+
+    },
+    "Scan Length" : {
+
+    },
+    "Scan Non-Japanese Text" : {
+
+    },
+    "Settings" : {
+
+    },
+    "Show Expression Tags" : {
+
+    },
+    "Status: %@" : {
+
+    },
+    "Tags" : {
+
+    },
+    "Term" : {
+
+    },
+    "This will check for and install updates for these dictionaries:\n%@" : {
+
+    },
+    "This will clear your current mappings." : {
+
+    },
+    "This will download the latest version of the following dictionaries (33 MB):\nJMdict (Term)\nJMnedict (Term)\nJiten (Frequency)" : {
+
+    },
+    "This will replace AnkiMobile callbacks with AnkiConnect requests." : {
+
+    },
+    "Type" : {
+
+    },
+    "Update" : {
+
+    },
+    "Update Dictionaries" : {
+
+    },
+    "Use AnkiConnect" : {
+
+    },
+    "Yomitan term, frequency and pitch dictionaries (.zip) are supported" : {
+
+    }
+  },
+  "version" : "1.2"
+}
